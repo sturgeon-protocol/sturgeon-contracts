@@ -27,6 +27,10 @@ contract Controller is IController {
 
     address public ifo;
 
+    address public vesting;
+
+    address public ve;
+
     address public veDistributor;
 
     /// @dev Operators can execute not-critical functions of the platform.
@@ -52,10 +56,17 @@ contract Controller is IController {
         _operators.add(governance_);
     }
 
-    function setup(address ifo_) external {
-        require(ifo_ != address(0), "WRONG_INPUT");
+    function setup(address ifo_, address vesting_, address ve_) external {
+        require(
+            ifo_ != address(0)
+            && vesting_ != address(0)
+            && ve_ != address(0),
+            "WRONG_INPUT"
+        );
         require (ifo == address(0), "ALREADY");
         ifo = ifo_;
+        vesting = vesting_;
+        ve = ve_;
     }
 
     function _onlyGovernance() internal view {

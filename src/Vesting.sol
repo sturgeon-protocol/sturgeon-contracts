@@ -7,13 +7,13 @@ contract Vesting {
   using SafeERC20 for IERC20;
 
   /// @dev Token for vesting
-  IERC20 public immutable token;
+  IERC20 public token;
   /// @dev Will start after the cliff
-  uint public immutable vestingPeriod;
+  uint public vestingPeriod;
   /// @dev Delay before the vesting
-  uint public immutable cliffPeriod;
+  uint public cliffPeriod;
   /// @dev Who will receive the tokens
-  address public immutable claimant;
+  address public claimant;
 
   uint public startTs;
   uint public toDistribute;
@@ -21,12 +21,15 @@ contract Vesting {
   event Started(uint amount, uint time);
   event Claimed(address claimer, uint amount);
 
-  constructor(address _token, uint _vestingPeriod, uint _cliffPeriod, address _claimant) {
-    require(_token != address(0) && _claimant != address(0), "zero address");
-    token = IERC20(_token);
-    vestingPeriod = _vestingPeriod;
-    cliffPeriod = _cliffPeriod;
-    claimant = _claimant;
+  constructor() {}
+
+  function setup(address token_, uint vestingPeriod_, uint cliffPeriod_, address claimant_) external {
+    require (token_ != address(0), "WRONG_INPUT");
+    require (address(token) == address(0), "ALREADY");
+    token = IERC20(token_);
+    vestingPeriod = vestingPeriod_;
+    cliffPeriod = cliffPeriod_;
+    claimant = claimant_;
   }
 
   function start(uint amount) external {

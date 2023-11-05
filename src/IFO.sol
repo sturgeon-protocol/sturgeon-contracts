@@ -13,7 +13,6 @@ contract IFO {
 
     constructor (uint rate_) {
         rate = rate_;
-
     }
 
     function setup(address stgn_) external {

@@ -1,17 +1,16 @@
-// SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.13;
+// SPDX-License-Identifier: BUSL-1.1
+pragma solidity ^0.8.21;
 
 import {Test, console2} from "forge-std/Test.sol";
 import {Controller} from "../src/Controller.sol";
+import "./setup/MockSetup.sol";
 
-contract ControllerTest is Test {
-    Controller public controller;
-
-    function setUp() public {
-        controller = new Controller(address(this));
-    }
+contract ControllerTest is Test, MockSetup {
+    function setUp() public {}
 
     function test_init() public {
+        controller = _init();
+
         assertEq(controller.governance(), address(this));
         assertEq(controller.isOperator(address(this)), true);
         vm.expectRevert();
