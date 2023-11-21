@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.21;
 
+import "openzeppelin-contracts/contracts/utils/Strings.sol";
 import "./interfaces/IStrategyStrict.sol";
 import "./interfaces/IVault.sol";
 import "./base/Controllable.sol";
-import "openzeppelin-contracts/contracts/utils/Strings.sol";
 import "./lib/StringLib.sol";
 
 /// @title Gelato resolver for hard work
@@ -14,7 +14,7 @@ contract Compounder is Controllable {
 
   string public constant VERSION = "1.0.0";
   uint public constant DELAY_RATE_DENOMINATOR = 100_000;
-  uint public constant HARDWORK_DELAY = 1 days;
+  uint public constant HARDWORK_DELAY = 12 hours;
 
   // --- VARIABLES ---
 

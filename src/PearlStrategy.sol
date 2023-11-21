@@ -2,6 +2,7 @@
 pragma solidity ^0.8.21;
 
 import "./base/StrategyStrictBase.sol";
+import "./interfaces/IVault.sol";
 
 /*´:°•.°+.*•´.*:˚.°*.˚•´.°:°•.°•.*•´.°:°•.°+.*•´.*:*.°:°•.°•.*•´.*:˚.°*.˚•´.°:°•.°+.*•´.*/
 /*                                 Pearl strategy                                       */
@@ -18,13 +19,17 @@ import "./base/StrategyStrictBase.sol";
 contract PearlStrategy is StrategyStrictBase {
 
     uint public lastHardWork;
+    address public pool;
 
-    constructor(address vault_) StrategyStrictBase(vault_) {
-
+    constructor(address vault_, address pool_) StrategyStrictBase(vault_) {
+        vault = vault_;
+        asset = IVault(vault_).asset();
+        pool = pool_;
     }
 
-    function isReadyToHardWork() external view returns (bool) {
-
+    function isReadyToHardWork() external pure returns (bool) {
+        // todo
+        return true;
     }
 
     function doHardWork() external returns (uint earned, uint lost) {}

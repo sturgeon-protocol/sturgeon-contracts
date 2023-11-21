@@ -26,7 +26,7 @@ contract Vault is ERC4626, ReentrancyGuard, IVault {
   // *************************************************************
 
   /// @dev Connected strategy. Can not be changed.
-  IStrategyStrict public immutable strategy;
+  IStrategyStrict public strategy;
   /// @dev Percent of assets that will always stay in this vault.
   uint public immutable buffer;
 
@@ -44,7 +44,6 @@ contract Vault is ERC4626, ReentrancyGuard, IVault {
     IERC20 asset_,
     string memory name_,
     string memory symbol_,
-    address strategy_,
     uint buffer_
   )
   ERC20(name_, symbol_)
@@ -53,6 +52,10 @@ contract Vault is ERC4626, ReentrancyGuard, IVault {
     // buffer is 5% max
     require(buffer_ <= BUFFER_DENOMINATOR / 20, "!BUFFER");
     buffer = buffer_;
+  }
+
+  function setStrategy(address strategy_) external {
+    require (address(strategy) == address(0), "Already");
     strategy = IStrategyStrict(strategy_);
   }
 

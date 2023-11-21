@@ -2,8 +2,9 @@
 pragma solidity 0.8.21;
 
 import "openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol";
+import "./interfaces/IVesting.sol";
 
-contract Vesting {
+contract Vesting is IVesting {
   using SafeERC20 for IERC20;
 
   /// @dev Token for vesting
@@ -34,7 +35,6 @@ contract Vesting {
 
   function start(uint amount) external {
     require(startTs == 0, "Already started");
-    require(claimant == msg.sender, "Not claimant");
 
     require(IERC20(token).balanceOf(address(this)) == amount, "Incorrect amount");
 

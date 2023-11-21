@@ -22,12 +22,12 @@ contract Controller is IController {
     /// @dev Gnosis safe multi signature wallet with maximum power under the platform.
     address public governance;
 
+    address public stgn;
+
     /// @dev External solution for sell any tokens with minimal gas usage.
     address public liquidator;
 
     address public ifo;
-
-    address public vesting;
 
     address public ve;
 
@@ -56,17 +56,17 @@ contract Controller is IController {
         _operators.add(governance_);
     }
 
-    function setup(address ifo_, address vesting_, address ve_) external {
+    function setup(address ifo_, address ve_, address stgn_) external {
         require(
             ifo_ != address(0)
-            && vesting_ != address(0)
+            && stgn_ != address(0)
             && ve_ != address(0),
             "WRONG_INPUT"
         );
         require (ifo == address(0), "ALREADY");
         ifo = ifo_;
-        vesting = vesting_;
         ve = ve_;
+        stgn = stgn_;
     }
 
     function _onlyGovernance() internal view {
