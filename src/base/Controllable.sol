@@ -17,8 +17,8 @@ abstract contract Controllable is Initializable, IControllable {
     /// @dev Should be incremented when contract changed
     string public constant CONTROLLABLE_VERSION = "1.0.0";
 
-    bytes32 internal constant _CONTROLLER_SLOT = bytes32(uint256(keccak256("eip1967.controllable.controller")) - 1);
-    bytes32 internal constant _CREATED_BLOCK_SLOT = bytes32(uint256(keccak256("eip1967.controllable.created_block")) - 1);
+    bytes32 internal constant _CONTROLLER_SLOT = bytes32(uint(keccak256("eip1967.controllable.controller")) - 1);
+    bytes32 internal constant _CREATED_BLOCK_SLOT = bytes32(uint(keccak256("eip1967.controllable.created_block")) - 1);
 
     event ContractInitialized(address controller, uint ts, uint block);
 
@@ -40,12 +40,12 @@ abstract contract Controllable is Initializable, IControllable {
     }
 
     /// @dev Return true if given address is controller
-    function isController(address _value) public override view returns (bool) {
+    function isController(address _value) public view override returns (bool) {
         return _value == controller();
     }
 
     /// @notice Return true if given address is setup as governance in Controller
-    function isGovernance(address _value) public override view returns (bool) {
+    function isGovernance(address _value) public view override returns (bool) {
         return IController(controller()).governance() == _value;
     }
 
@@ -58,7 +58,7 @@ abstract contract Controllable is Initializable, IControllable {
 
     /// @notice Return creation block number
     /// @return Creation block number
-    function createdBlock() external override view returns (uint256) {
+    function createdBlock() external view override returns (uint) {
         return _CREATED_BLOCK_SLOT.getUint();
     }
 

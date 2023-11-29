@@ -2,13 +2,11 @@
 pragma solidity ^0.8.21;
 
 interface IVeDistributor {
+    function rewardToken() external view returns (address);
 
-  function rewardToken() external view returns (address);
+    function checkpoint() external;
 
-  function checkpoint() external;
+    function checkpointTotalSupply() external;
 
-  function checkpointTotalSupply() external;
-
-  function claim(uint _tokenId) external returns (uint);
-
+    function claim(uint _tokenId) external returns (uint);
 }

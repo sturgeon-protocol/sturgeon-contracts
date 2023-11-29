@@ -9,11 +9,7 @@ contract MockERC20 is ERC20Permit {
     // add this to be excluded from coverage report
     function test() public {}
 
-    constructor(
-        string memory name_,
-        string memory symbol_,
-        uint8 decimals_
-    ) ERC20(name_, symbol_) ERC20Permit(name_) {
+    constructor(string memory name_, string memory symbol_, uint8 decimals_) ERC20(name_, symbol_) ERC20Permit(name_) {
         _decimals = decimals_;
     }
 

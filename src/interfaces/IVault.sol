@@ -6,5 +6,5 @@ import "./IStrategyStrict.sol";
 
 interface IVault is IERC4626 {
     function strategy() external view returns (IStrategyStrict);
-
+    function controller() external view returns (address);
 }

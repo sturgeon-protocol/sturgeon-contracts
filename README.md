@@ -9,4 +9,5 @@ forge install
 forge build
 forge test -vv
 forge coverage
+forge fmt
 ```

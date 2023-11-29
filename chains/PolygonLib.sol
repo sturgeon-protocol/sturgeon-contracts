@@ -5,6 +5,7 @@ import {console} from "forge-std/Test.sol";
 import "../script/lib/DeployLib.sol";
 
 library PolygonLib {
+    address public constant TOKEN_PEARL = 0x7238390d5f6F64e67c3211C343A410E2A3DEc142;
 
     function runDeploy(bool showLog) external {
         address governance = 0x520Ab98a23100369E5280d214799b1E1c0123045;
@@ -23,7 +24,8 @@ library PolygonLib {
             vestingClaimant: vestingClaimant,
             vestingAmount:  vestingAmount,
             vestingPeriod: 365 days,
-            vestingCliff: 180 days
+            vestingCliff: 180 days,
+            rewardToken: TOKEN_PEARL
         })));
 
         if (showLog) {

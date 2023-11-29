@@ -1,9 +1,7 @@
 // SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.21;
 
-
 abstract contract UpgradeableProxy {
-
     /// @dev This is the keccak-256 hash of "eip1967.proxy.implementation" subtracted by 1, and is
     bytes32 private constant _IMPLEMENTATION_SLOT = 0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc;
 
@@ -54,26 +52,22 @@ abstract contract UpgradeableProxy {
      */
     function _delegate(address implementation) internal virtual {
         assembly {
-        // Copy msg.data. We take full control of memory in this inline assembly
-        // block because it will not return to Solidity code. We overwrite the
-        // Solidity scratch pad at memory position 0.
+            // Copy msg.data. We take full control of memory in this inline assembly
+            // block because it will not return to Solidity code. We overwrite the
+            // Solidity scratch pad at memory position 0.
             calldatacopy(0, 0, calldatasize())
 
-        // Call the implementation.
-        // out and outsize are 0 because we don't know the size yet.
+            // Call the implementation.
+            // out and outsize are 0 because we don't know the size yet.
             let result := delegatecall(gas(), implementation, 0, calldatasize(), 0, 0)
 
-        // Copy the returned data.
+            // Copy the returned data.
             returndatacopy(0, 0, returndatasize())
 
             switch result
             // delegatecall returns 0 on error.
-            case 0 {
-                revert(0, returndatasize())
-            }
-            default {
-                return (0, returndatasize())
-            }
+            case 0 { revert(0, returndatasize()) }
+            default { return(0, returndatasize()) }
         }
     }
 

@@ -27,7 +27,6 @@ abstract contract MockSetup is Test {
     }
 
     function _init() public returns (Controller) {
-
         address[] memory vestingClaimant = new address[](2);
         uint[] memory vestingAmount = new uint[](2);
         vestingClaimant[0] = address(1);
@@ -35,14 +34,19 @@ abstract contract MockSetup is Test {
         vestingAmount[0] = 1e24;
         vestingAmount[1] = 2e24;
 
-        Controller _c = Controller(DeployLib.deployPlatform(DeployLib.DeployParams({
-            governance: address(this),
-            ifoRate: 12e17,
-            vestingClaimant: vestingClaimant,
-            vestingAmount:  vestingAmount,
-            vestingPeriod: 365 days,
-            vestingCliff: 30 days
-        })));
+        Controller _c = Controller(
+            DeployLib.deployPlatform(
+                DeployLib.DeployParams({
+                    governance: address(this),
+                    ifoRate: 12e17,
+                    vestingClaimant: vestingClaimant,
+                    vestingAmount: vestingAmount,
+                    vestingPeriod: 365 days,
+                    vestingCliff: 30 days,
+                    rewardToken: tokenC
+                })
+            )
+        );
 
         return _c;
     }

@@ -2,11 +2,9 @@
 pragma solidity ^0.8.21;
 
 interface IProxyControlled {
+    function initProxy(address _logic) external;
 
-  function initProxy(address _logic) external;
+    function upgrade(address _newImplementation) external;
 
-  function upgrade(address _newImplementation) external;
-
-  function implementation() external view returns (address);
-
+    function implementation() external view returns (address);
 }

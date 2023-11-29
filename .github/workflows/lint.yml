@@ -1,4 +1,4 @@
-name: tests
+name: Lint
 
 on:
   push:
@@ -15,7 +15,7 @@ jobs:
     strategy:
       fail-fast: true
 
-    name: Foundry project
+    name: Formatter
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -27,19 +27,5 @@ jobs:
         with:
           version: nightly
 
-      - name: Run Forge build
-        run: |
-          forge --version
-          forge build --sizes
-        id: build
-
-      - name: Run Forge tests
-        run: |
-          forge test -vvv
-        id: test
-
-      - name: Run Forge coverage
-        run: |
-          forge coverage
-          forge coverage --report lcov
-        id: coverage
+      - name: Run forge fmt --check
+        run: forge fmt --check

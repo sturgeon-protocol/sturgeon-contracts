@@ -6,7 +6,6 @@ import "@openzeppelin/contracts/utils/structs/EnumerableMap.sol";
 import "./interfaces/IProxyControlled.sol";
 import "./interfaces/IController.sol";
 
-
 contract Controller is IController {
     using EnumerableSet for EnumerableSet.AddressSet;
     using EnumerableMap for EnumerableMap.AddressToUintMap;
@@ -33,6 +32,8 @@ contract Controller is IController {
 
     address public veDistributor;
 
+    address public multigauge;
+
     /// @dev Operators can execute not-critical functions of the platform.
     EnumerableSet.AddressSet internal _operators;
 
@@ -40,7 +41,6 @@ contract Controller is IController {
     EnumerableMap.AddressToUintMap internal _proxyTimeLocks;
     /// @dev Set of valid vaults
     EnumerableSet.AddressSet internal _vaults;
-
 
     event ProxyUpgradeAnnounced(address proxy, address implementation);
     event ProxyUpgraded(address proxy, address implementation);
@@ -56,17 +56,15 @@ contract Controller is IController {
         _operators.add(governance_);
     }
 
-    function setup(address ifo_, address ve_, address stgn_) external {
+    function setup(address ifo_, address ve_, address stgn_, address multigauge_) external {
         require(
-            ifo_ != address(0)
-            && stgn_ != address(0)
-            && ve_ != address(0),
-            "WRONG_INPUT"
+            ifo_ != address(0) && stgn_ != address(0) && multigauge_ != address(0) && ve_ != address(0), "WRONG_INPUT"
         );
-        require (ifo == address(0), "ALREADY");
+        require(ifo == address(0), "ALREADY");
         ifo = ifo_;
         ve = ve_;
         stgn = stgn_;
+        multigauge = multigauge_;
     }
 
     function _onlyGovernance() internal view {
@@ -122,10 +120,7 @@ contract Controller is IController {
     //          UPGRADE PROXIES WITH TIME-LOCK PROTECTION
     // *************************************************************
 
-    function announceProxyUpgrade(
-        address[] memory proxies,
-        address[] memory implementations
-    ) external {
+    function announceProxyUpgrade(address[] memory proxies, address[] memory implementations) external {
         _onlyGovernance();
         require(proxies.length == implementations.length, "WRONG_INPUT");
 

@@ -3,7 +3,6 @@ pragma solidity ^0.8.21;
 
 import "./setup/MockSetup.sol";
 
-
 contract VestingTest is MockSetup {
     function test_vesting() public {
         address[] memory vesting = ISTGN(controller.stgn()).vesting();
@@ -22,6 +21,5 @@ contract VestingTest is MockSetup {
             _vesting.claim();
             vm.stopPrank();
         }
-
     }
 }
