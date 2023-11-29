@@ -57,4 +57,6 @@ library DeployLib {
 
         return address(_c);
     }
+
+    function testDeployLib() external {}
 }

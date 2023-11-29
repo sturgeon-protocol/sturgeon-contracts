@@ -20,9 +20,9 @@ abstract contract MockSetup is Test {
     address public tokenC;
 
     constructor() {
-        tokenA = address(new MockERC20('Mock Token A', 'MOCK_A', 18));
-        tokenB = address(new MockERC20('Mock Token B', 'MOCK_B', 6));
-        tokenC = address(new MockERC20('Mock Token C', 'MOCK_C', 18));
+        tokenA = address(new MockERC20("Mock Token A", "MOCK_A", 18));
+        tokenB = address(new MockERC20("Mock Token B", "MOCK_B", 6));
+        tokenC = address(new MockERC20("Mock Token C", "MOCK_C", 18));
         controller = _init();
     }
 
