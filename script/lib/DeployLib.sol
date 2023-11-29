@@ -21,7 +21,7 @@ library DeployLib {
         address rewardToken; // PEARL
     }
 
-    function deployPlatform(DeployParams memory params) external returns (address controller) {
+    function deployPlatform(DeployParams memory params) internal returns (address controller) {
         Controller _c = new Controller(params.governance);
         IFO ifo = new IFO(params.ifoRate); // 12e17
 
@@ -57,4 +57,6 @@ library DeployLib {
 
         return address(_c);
     }
+
+    function testDeployLib() external {}
 }
