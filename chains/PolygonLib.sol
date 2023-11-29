@@ -7,7 +7,7 @@ import "../script/lib/DeployLib.sol";
 library PolygonLib {
     address public constant TOKEN_PEARL = 0x7238390d5f6F64e67c3211C343A410E2A3DEc142;
 
-    function runDeploy(bool showLog) external {
+    function runDeploy(bool showLog) internal {
         address governance = 0x520Ab98a23100369E5280d214799b1E1c0123045;
         address[] memory vestingClaimant = new address[](3);
         uint[] memory vestingAmount = new uint[](3);
