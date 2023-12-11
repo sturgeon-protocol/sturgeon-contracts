@@ -3,13 +3,19 @@ pragma solidity ^0.8.21;
 
 import "./setup/MockSetup.sol";
 import "./mock/MockStrategy.sol";
-import "../src/Vault.sol";
+import "../src/HarvesterVault.sol";
 
 contract VaultTest is MockSetup {
     function test_vault() public {
-        Vault vault = new Vault(address(controller), IERC20(tokenA), "Vault for MOCK_A", "xTokenA", 4_000);
+        HarvesterVault vault = new HarvesterVault(
+            address(controller),
+            IERC20(tokenA),
+            "Harvester vault for MOCK_A", "xTokenA",
+            4_000
+        );
         MockStrategy strategy = new MockStrategy(address(vault), address(1));
         vault.setStrategy(address(strategy));
+        IGauge(controller.multigauge()).addStakingToken(address(vault));
 
         deal(tokenA, address(this), 1e20);
         IERC20(tokenA).approve(address(vault), 1e20);

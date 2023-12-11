@@ -27,14 +27,26 @@ contract PearlStrategy is StrategyStrictBase {
 
     address public gauge;
 
-    bool public harvester;
+    address public gaugeRewardToken;
 
-    constructor(address vault_, address gauge_, bool harvester_) StrategyStrictBase(vault_) {
+    bool public ifo;
+
+    address public compounder;
+
+    constructor(address vault_, address gauge_, bool ifo_, address compounder_) StrategyStrictBase(vault_) {
         vault = vault_;
         asset = IVault(vault_).asset();
         gauge = gauge_;
-        harvester = harvester_;
+        ifo = ifo_;
+        compounder = compounder_;
         IERC20(asset).approve(gauge_, type(uint).max);
+        address _gaugeRewardToken = IPearlGaugeV2(gauge_).rewardToken();
+        gaugeRewardToken = _gaugeRewardToken;
+        if (ifo) {
+            IController controller = IController(IVault(vault).controller());
+            IERC20(_gaugeRewardToken).approve(controller.ifo(), type(uint).max);
+            IERC20(controller.stgn()).approve(controller.multigauge(), type(uint).max);
+        }
     }
 
     function isReadyToHardWork() external view returns (bool) {
@@ -49,17 +61,21 @@ contract PearlStrategy is StrategyStrictBase {
 
         IController controller = IController(IVault(vault).controller());
 
-        if (harvester) {
-            IIFO ifo = IIFO(controller.ifo());
+        if (ifo) {
+            IIFO _ifo = IIFO(controller.ifo());
             IGauge multigauge = IGauge(controller.multigauge());
-            (bool exchanged, uint got) = ifo.exchange(rtReward);
-            if (exchanged) {
+            (bool exchanged, uint got) = _ifo.exchange(rtReward);
+            if (exchanged && got > 0) {
                 multigauge.notifyRewardAmount(vault, controller.stgn(), got);
-            } else {
+            }/* else {
                 multigauge.notifyRewardAmount(vault, IPearlGaugeV2(gauge).rewardToken(), rtReward);
-            }
+            }*/
         } else {
-            // todo Compounder CVR
+            // todo Compounder
+
+
+
+
         }
     }
 
@@ -68,8 +84,7 @@ contract PearlStrategy is StrategyStrictBase {
     }
 
     function _claim() internal override returns (uint rtReward) {
-        IPearlGaugeV2 _gauge = IPearlGaugeV2(gauge);
-        IERC20 rt = IERC20(_gauge.rewardToken());
+        IERC20 rt = IERC20(gaugeRewardToken);
         uint oldBal = rt.balanceOf(address(this));
         IPearlGaugeV2(gauge).getReward();
         rtReward = rt.balanceOf(address(this)) - oldBal;

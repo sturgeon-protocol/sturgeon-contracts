@@ -10,15 +10,17 @@ contract Controller is IController {
     using EnumerableSet for EnumerableSet.AddressSet;
     using EnumerableMap for EnumerableMap.AddressToUintMap;
 
-    struct ProxyAnnounce {
-        address proxy;
-        address implementation;
-        uint timeLockAt;
-    }
+    /*´:°•.°+.*•´.*:˚.°*.˚•´.°:°•.°•.*•´.*:˚.°*.˚•´.°:°•.°+.*•´.*:*/
+    /*                         CONSTANTS                          */
+    /*.•°:°.´+˚.*°.˚:*.´•*.+°.•°:´*.´•*.•°.•°:°.´:•˚°.*°.˚:*.´+°.•*/
 
     uint public constant TIME_LOCK = 24 hours;
 
-    /// @dev Gnosis safe multi signature wallet with maximum power under the platform.
+    /*´:°•.°+.*•´.*:˚.°*.˚•´.°:°•.°•.*•´.*:˚.°*.˚•´.°:°•.°+.*•´.*:*/
+    /*                          STORAGE                           */
+    /*.•°:°.´+˚.*°.˚:*.´•*.+°.•°:´*.´•*.•°.•°:°.´:•˚°.*°.˚:*.´+°.•*/
+
+    /// @inheritdoc IController
     address public governance;
 
     address public stgn;
@@ -34,21 +36,22 @@ contract Controller is IController {
 
     address public multigauge;
 
+    mapping(address => address) public proxyAnnounces;
+
     /// @dev Operators can execute not-critical functions of the platform.
     EnumerableSet.AddressSet internal _operators;
 
-    mapping(address => address) public proxyAnnounces;
     EnumerableMap.AddressToUintMap internal _proxyTimeLocks;
-    /// @dev Set of valid vaults
-    EnumerableSet.AddressSet internal _vaults;
 
-    event ProxyUpgradeAnnounced(address proxy, address implementation);
-    event ProxyUpgraded(address proxy, address implementation);
-    event ProxyAnnounceRemoved(address proxy);
-    event RegisterVault(address vault);
-    event VaultRemoved(address vault);
-    event OperatorAdded(address operator);
-    event OperatorRemoved(address operator);
+    /// @dev Set of deployed harvester vaults
+    EnumerableSet.AddressSet internal _harvesters;
+
+    /// @dev Set of deployed compounder vaults
+    EnumerableSet.AddressSet internal _compounders;
+
+    /*´:°•.°+.*•´.*:˚.°*.˚•´.°:°•.°•.*•´.*:˚.°*.˚•´.°:°•.°+.*•´.*:*/
+    /*                      INITIALIZATION                        */
+    /*.•°:°.´+˚.*°.˚:*.´•*.+°.•°:´*.´•*.•°.•°:°.´:•˚°.*°.˚:*.´+°.•*/
 
     constructor(address governance_) {
         require(governance_ != address(0), "WRONG_INPUT");
@@ -67,13 +70,93 @@ contract Controller is IController {
         multigauge = multigauge_;
     }
 
-    function _onlyGovernance() internal view {
-        require(msg.sender == governance, "DENIED");
+    /*´:°•.°+.*•´.*:˚.°*.˚•´.°:°•.°•.*•´.*:˚.°*.˚•´.°:°•.°+.*•´.*:*/
+    /*                         MODIFIERS                          */
+    /*.•°:°.´+˚.*°.˚:*.´•*.+°.•°:´*.´•*.•°.•°:°.´:•˚°.*°.˚:*.´+°.•*/
+
+    modifier onlyOperator() {
+        _onlyOperators();
+        _;
     }
 
-    function _onlyOperators() internal view {
-        require(_operators.contains(msg.sender), "DENIED");
+    modifier onlyGovernance() {
+        _onlyGovernance();
+        _;
     }
+
+    /*´:°•.°+.*•´.*:˚.°*.˚•´.°:°•.°•.*•´.*:˚.°*.˚•´.°:°•.°+.*•´.*:*/
+    /*                      RESTRICTED ACTIONS                    */
+    /*.•°:°.´+˚.*°.˚:*.´•*.+°.•°:´*.´•*.•°.•°:°.´:•˚°.*°.˚:*.´+°.•*/
+
+    function announceProxyUpgrade(address[] memory proxies, address[] memory implementations) external onlyGovernance {
+        require(proxies.length == implementations.length, "WRONG_INPUT");
+        for (uint i; i < proxies.length; i++) {
+            address proxy = proxies[i];
+            address implementation = implementations[i];
+            require(implementation != address(0), "ZERO_IMPL");
+            require(_proxyTimeLocks.set(proxy, block.timestamp + TIME_LOCK), "ANNOUNCED");
+            proxyAnnounces[proxy] = implementation;
+            emit ProxyUpgradeAnnounced(proxy, implementation);
+        }
+    }
+
+    /// @dev Upgrade proxy. Less strict for reduce governance actions.
+    function upgradeProxy(address[] memory proxies) external onlyOperator {
+        for (uint i; i < proxies.length; i++) {
+            address proxy = proxies[i];
+            uint timeLock = _proxyTimeLocks.get(proxy);
+            // Map get will revert on not exist key, no need to check to zero
+            address implementation = proxyAnnounces[proxy];
+            require(timeLock < block.timestamp, "LOCKED");
+            IProxyControlled(proxy).upgrade(implementation);
+            _proxyTimeLocks.remove(proxy);
+            delete proxyAnnounces[proxy];
+            emit ProxyUpgraded(proxy, implementation);
+        }
+    }
+
+    function removeProxyAnnounce(address proxy) external onlyOperator {
+        _proxyTimeLocks.remove(proxy);
+        delete proxyAnnounces[proxy];
+        emit ProxyAnnounceRemoved(proxy);
+    }
+
+    /// @dev Register vault in the system.
+    ///      Operator should do it as part of deployment process.
+    function registerVault(address vault, bool isHarvester) external onlyOperator {
+        if (isHarvester) {
+            require(_harvesters.add(vault), "EXIST");
+        } else {
+            require(_compounders.add(vault), "EXIST");
+        }
+        emit RegisterVault(vault, isHarvester);
+    }
+
+    /// @dev Remove vault from the system. Only for critical cases.
+    function removeVault(address vault, bool isHarvester) external onlyGovernance {
+        if (isHarvester) {
+            require(_harvesters.remove(vault), "NOT_EXIST");
+        } else {
+            require(_compounders.remove(vault), "NOT_EXIST");
+        }
+        emit VaultRemoved(vault, isHarvester);
+    }
+
+    /// @dev Register new operator.
+    function registerOperator(address value) external onlyGovernance {
+        require(_operators.add(value), "EXIST");
+        emit OperatorAdded(value);
+    }
+
+    /// @dev Remove operator.
+    function removeOperator(address value) external onlyGovernance {
+        require(_operators.remove(value), "NOT_EXIST");
+        emit OperatorRemoved(value);
+    }
+
+    /*´:°•.°+.*•´.*:˚.°*.˚•´.°:°•.°•.*•´.*:˚.°*.˚•´.°:°•.°+.*•´.*:*/
+    /*                      VIEW FUNCTIONS                        */
+    /*.•°:°.´+˚.*°.˚:*.´•*.+°.•°:´*.´•*.•°.•°:°.´:•˚°.*°.˚:*.´+°.•*/
 
     /// @dev Return all announced proxy upgrades.
     function proxyAnnouncesList() external view returns (ProxyAnnounce[] memory announces) {
@@ -96,110 +179,50 @@ contract Controller is IController {
         return _operators.values();
     }
 
-    /// @dev Return all vaults. Array can be too big for use this function.
-    function vaultsList() external view override returns (address[] memory) {
-        return _vaults.values();
+    /// @inheritdoc IController
+    function harvesterVaultsList() external view override returns (address[] memory) {
+        return _harvesters.values();
     }
 
-    /// @dev Vault set size.
-    function vaultsListLength() external view override returns (uint) {
-        return _vaults.length();
+    /// @inheritdoc IController
+    function harvesterVaultsListLength() external view override returns (uint) {
+        return _harvesters.length();
     }
 
-    /// @dev Return vault with given id. Ordering can be changed with time!
-    function vaults(uint id) external view override returns (address) {
-        return _vaults.at(id);
+    /// @inheritdoc IController
+    function harvesterVaults(uint id) external view override returns (address) {
+        return _harvesters.at(id);
     }
 
-    /// @dev Return true if the vault valid.
-    function isValidVault(address _vault) external view override returns (bool) {
-        return _vaults.contains(_vault);
+    /// @inheritdoc IController
+    function compounderVaultsList() external view override returns (address[] memory) {
+        return _compounders.values();
     }
 
-    // *************************************************************
-    //          UPGRADE PROXIES WITH TIME-LOCK PROTECTION
-    // *************************************************************
-
-    function announceProxyUpgrade(address[] memory proxies, address[] memory implementations) external {
-        _onlyGovernance();
-        require(proxies.length == implementations.length, "WRONG_INPUT");
-
-        for (uint i; i < proxies.length; i++) {
-            address proxy = proxies[i];
-            address implementation = implementations[i];
-
-            require(implementation != address(0), "ZERO_IMPL");
-            require(_proxyTimeLocks.set(proxy, block.timestamp + TIME_LOCK), "ANNOUNCED");
-            proxyAnnounces[proxy] = implementation;
-
-            emit ProxyUpgradeAnnounced(proxy, implementation);
-        }
+    /// @inheritdoc IController
+    function compounderVaultsListLength() external view override returns (uint) {
+        return _compounders.length();
     }
 
-    /// @dev Upgrade proxy. Less strict for reduce governance actions.
-    function upgradeProxy(address[] memory proxies) external {
-        _onlyOperators();
-
-        for (uint i; i < proxies.length; i++) {
-            address proxy = proxies[i];
-            uint timeLock = _proxyTimeLocks.get(proxy);
-            // Map get will revert on not exist key, no need to check to zero
-            address implementation = proxyAnnounces[proxy];
-
-            require(timeLock < block.timestamp, "LOCKED");
-
-            IProxyControlled(proxy).upgrade(implementation);
-
-            _proxyTimeLocks.remove(proxy);
-            delete proxyAnnounces[proxy];
-
-            emit ProxyUpgraded(proxy, implementation);
-        }
+    /// @inheritdoc IController
+    function compounderVaults(uint id) external view override returns (address) {
+        return _compounders.at(id);
     }
 
-    function removeProxyAnnounce(address proxy) external {
-        _onlyOperators();
-
-        _proxyTimeLocks.remove(proxy);
-        delete proxyAnnounces[proxy];
-
-        emit ProxyAnnounceRemoved(proxy);
+    /// @inheritdoc IController
+    function isValidVault(address vault) external view override returns (bool) {
+        return _harvesters.contains(vault) || _compounders.contains(vault);
     }
 
-    // *************************************************************
-    //                     REGISTER ACTIONS
-    // *************************************************************
+    /*´:°•.°+.*•´.*:˚.°*.˚•´.°:°•.°•.*•´.*:˚.°*.˚•´.°:°•.°+.*•´.*:*/
+    /*                       INTERNAL LOGIC                       */
+    /*.•°:°.´+˚.*°.˚:*.´•*.+°.•°:´*.´•*.•°.•°:°.´:•˚°.*°.˚:*.´+°.•*/
 
-    /// @dev Register vault in the system.
-    ///      Operator should do it as part of deployment process.
-    function registerVault(address vault) external {
-        _onlyOperators();
-
-        require(_vaults.add(vault), "EXIST");
-        emit RegisterVault(vault);
+    function _onlyGovernance() internal view {
+        require(msg.sender == governance, "DENIED");
     }
 
-    /// @dev Remove vault from the system. Only for critical cases.
-    function removeVault(address vault) external {
-        _onlyGovernance();
-
-        require(_vaults.remove(vault), "NOT_EXIST");
-        emit VaultRemoved(vault);
-    }
-
-    /// @dev Register new operator.
-    function registerOperator(address value) external {
-        _onlyGovernance();
-
-        require(_operators.add(value), "EXIST");
-        emit OperatorAdded(value);
-    }
-
-    /// @dev Remove operator.
-    function removeOperator(address value) external {
-        _onlyGovernance();
-
-        require(_operators.remove(value), "NOT_EXIST");
-        emit OperatorRemoved(value);
+    function _onlyOperators() internal view {
+        require(_operators.contains(msg.sender), "DENIED");
     }
 }

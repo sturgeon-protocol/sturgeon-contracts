@@ -45,7 +45,7 @@ library DeployLib {
         proxy.initProxy(impl);
         VeSTGN ve = VeSTGN(address(proxy));
         ve.init(address(stgn), 1e18, address(_c));
-        //        assertEq(IProxyControlled(proxy).implementation(), impl);
+        // assertEq(IProxyControlled(proxy).implementation(), impl);
 
         proxy = new ControllableProxy();
         impl = address(new MultiGauge());

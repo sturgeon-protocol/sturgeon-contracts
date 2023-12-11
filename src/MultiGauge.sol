@@ -180,10 +180,6 @@ contract MultiGauge is StakelessMultiPoolBase, IGauge {
         return Math.min((_derived + _adjusted), _balance);
     }
 
-    function isStakeToken(address token) public view override returns (bool) {
-        return stakingTokens[token];
-    }
-
     // *************************************************************
     //                   REWARDS DISTRIBUTION
     // *************************************************************
@@ -195,4 +191,9 @@ contract MultiGauge is StakelessMultiPoolBase, IGauge {
     // *************************************************************
     //                        VIEWS
     // *************************************************************
+
+    function isStakeToken(address token) public view override returns (bool) {
+        return stakingTokens[token];
+    }
+
 }

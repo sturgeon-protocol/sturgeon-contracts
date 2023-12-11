@@ -22,13 +22,13 @@ contract ControllerTest is Test, MockSetup {
         controller.removeOperator(address(2));
         assertEq(controller.operatorsList().length, 1);
 
-        controller.registerVault(address(3));
-        assertEq(controller.vaultsListLength(), 1);
-        assertEq(controller.vaultsList().length, 1);
-        assertEq(controller.vaults(0), address(3));
+        controller.registerVault(address(3), true);
+        assertEq(controller.harvesterVaultsListLength(), 1);
+        assertEq(controller.harvesterVaultsList().length, 1);
+        assertEq(controller.harvesterVaults(0), address(3));
         assertEq(controller.isValidVault(address(3)), true);
-        controller.removeVault(address(3));
-        assertEq(controller.vaultsList().length, 0);
+        controller.removeVault(address(3), true);
+        assertEq(controller.harvesterVaultsList().length, 0);
         assertEq(controller.isValidVault(address(3)), false);
     }
 }

@@ -5,6 +5,14 @@ import "openzeppelin-contracts/contracts/interfaces/IERC4626.sol";
 import "./IStrategyStrict.sol";
 
 interface IVault is IERC4626 {
+    // *************************************************************
+    //                        EVENTS
+    // *************************************************************
+
+    event Invest(address splitter, uint amount);
+
+    /// @dev Connected strategy. Can not be changed.
     function strategy() external view returns (IStrategyStrict);
+
     function controller() external view returns (address);
 }

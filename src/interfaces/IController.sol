@@ -2,7 +2,24 @@
 pragma solidity ^0.8.21;
 
 interface IController {
+
+    event ProxyUpgradeAnnounced(address proxy, address implementation);
+    event ProxyUpgraded(address proxy, address implementation);
+    event ProxyAnnounceRemoved(address proxy);
+    event RegisterVault(address vault, bool isHarvester);
+    event VaultRemoved(address vault, bool isHarvester);
+    event OperatorAdded(address operator);
+    event OperatorRemoved(address operator);
+
+    struct ProxyAnnounce {
+        address proxy;
+        address implementation;
+        uint timeLockAt;
+    }
+
     // --- DEPENDENCY ADDRESSES
+
+    /// @notice Gnosis safe multi signature wallet with maximum power under the platform.
     function governance() external view returns (address);
 
     function stgn() external view returns (address);
@@ -17,19 +34,41 @@ interface IController {
     /// @notice Proxy contract for distribute profit to ve holders.
     function veDistributor() external view returns (address);
 
+    /// @notice Gauge for IFO
     function multigauge() external view returns (address);
-
-    //  function platformVoter() external view returns (address);
 
     // --- VAULTS
 
-    function vaults(uint id) external view returns (address);
+    /// @notice Return harvester with given id
+    /// @param id Harvester vault ID
+    /// @return harvester vault address
+    function harvesterVaults(uint id) external view returns (address);
 
-    function vaultsList() external view returns (address[] memory);
+    /// @notice Get all harvesters
+    /// @dev Array can be too big for use this function
+    /// @return Harvester vault addresses
+    function harvesterVaultsList() external view returns (address[] memory);
 
-    function vaultsListLength() external view returns (uint);
+    /// @notice Total harvesters deployed
+    function harvesterVaultsListLength() external view returns (uint);
 
-    function isValidVault(address _vault) external view returns (bool);
+    /// @notice Return compounder vault with given id
+    /// @param id Compounder vault ID
+    /// @return compounder vault address
+    function compounderVaults(uint id) external view returns (address);
+
+    /// @notice Get all compounders
+    /// @dev Array can be too big for use this function
+    /// @return compounder vault addresses
+    function compounderVaultsList() external view returns (address[] memory);
+
+    /// @notice Total compounders deployed
+    function compounderVaultsListLength() external view returns (uint);
+
+    /// @dev Check address to be valid vault
+    /// @param vault Harvester or Compounder vault address
+    /// @return True if the vault valid
+    function isValidVault(address vault) external view returns (bool);
 
     // --- restrictions
 
