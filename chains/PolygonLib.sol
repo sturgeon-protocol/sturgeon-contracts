@@ -25,7 +25,8 @@ library PolygonLib {
             vestingAmount:  vestingAmount,
             vestingPeriod: 365 days,
             vestingCliff: 180 days,
-            rewardToken: TOKEN_PEARL
+            rewardToken: TOKEN_PEARL,
+            liquidator: address(0)
         })));
 
         if (showLog) {

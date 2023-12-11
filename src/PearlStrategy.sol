@@ -7,6 +7,7 @@ import "./interfaces/IPearlGaugeV2.sol";
 import "./interfaces/IController.sol";
 import "./interfaces/IIFO.sol";
 import "./interfaces/IGauge.sol";
+import "./interfaces/ITetuLiquidator.sol";
 
 /*´:°•.°+.*•´.*:˚.°*.˚•´.°:°•.°•.*•´.°:°•.°+.*•´.*:*.°:°•.°•.*•´.*:˚.°*.˚•´.°:°•.°+.*•´.*/
 /*                                 Pearl strategy                                       */
@@ -61,9 +62,9 @@ contract PearlStrategy is StrategyStrictBase {
 
         IController controller = IController(IVault(vault).controller());
 
+        IGauge multigauge = IGauge(controller.multigauge());
         if (ifo) {
             IIFO _ifo = IIFO(controller.ifo());
-            IGauge multigauge = IGauge(controller.multigauge());
             (bool exchanged, uint got) = _ifo.exchange(rtReward);
             if (exchanged && got > 0) {
                 multigauge.notifyRewardAmount(vault, controller.stgn(), got);
@@ -71,11 +72,14 @@ contract PearlStrategy is StrategyStrictBase {
                 multigauge.notifyRewardAmount(vault, IPearlGaugeV2(gauge).rewardToken(), rtReward);
             }*/
         } else {
-            // todo Compounder
-
-
-
-
+            ITetuLiquidator l = ITetuLiquidator(controller.liquidator());
+            address asset = IERC4626(compounder).asset();
+            uint b = IERC20(asset).balanceOf(address(this));
+            l.liquidate(gaugeRewardToken, IERC4626(compounder).asset(), rtReward, 0);
+            uint got = IERC20(asset).balanceOf(address(this)) - b;
+            if (got > 0) {
+                multigauge.notifyRewardAmount(vault, asset, got);
+            }
         }
     }
 

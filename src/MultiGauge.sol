@@ -195,5 +195,4 @@ contract MultiGauge is StakelessMultiPoolBase, IGauge {
     function isStakeToken(address token) public view override returns (bool) {
         return stakingTokens[token];
     }
-
 }

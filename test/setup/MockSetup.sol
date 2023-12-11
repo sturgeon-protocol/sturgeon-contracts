@@ -14,6 +14,7 @@ import "../../script/lib/DeployLib.sol";
 import "../mock/MockERC20.sol";
 import "../../src/interfaces/IPearlGaugeV2.sol";
 import "../mock/MockPearlGaugeV2.sol";
+import "../mock/MockTetuLiquidator.sol";
 
 abstract contract MockSetup is Test {
     Controller public controller;
@@ -54,7 +55,8 @@ abstract contract MockSetup is Test {
                     vestingAmount: vestingAmount,
                     vestingPeriod: 365 days,
                     vestingCliff: 30 days,
-                    rewardToken: tokenC
+                    rewardToken: tokenC,
+                    liquidator: address(new MockTetuLiquidator())
                 })
             )
         );

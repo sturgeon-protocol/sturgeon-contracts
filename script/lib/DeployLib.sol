@@ -19,24 +19,34 @@ library DeployLib {
         uint vestingPeriod;
         uint vestingCliff;
         address rewardToken; // PEARL
+        address liquidator;
+    }
+
+    struct DeployPlatformVars {
+        Controller c;
+        IFO ifo;
+        uint len;
+        address[] vesting;
+        STGN stgn;
     }
 
     function deployPlatform(DeployParams memory params) internal returns (address controller) {
-        Controller _c = new Controller(params.governance);
-        IFO ifo = new IFO(params.ifoRate); // 12e17
+        DeployPlatformVars memory v;
+        v.c = new Controller(params.governance);
+        v.ifo = new IFO(params.ifoRate); // 12e17
 
-        uint len = params.vestingClaimant.length;
-        address[] memory vesting = new address[](len);
-        for (uint i; i < len; ++i) {
-            vesting[i] = address(new Vesting());
+        v.len = params.vestingClaimant.length;
+        v.vesting = new address[](v.len);
+        for (uint i; i < v.len; ++i) {
+            v.vesting[i] = address(new Vesting());
         }
 
-        STGN stgn = new STGN(params.governance, address(ifo), 1e26, 5e25, vesting, params.vestingAmount);
-        ifo.setup(address(_c), address(stgn), params.rewardToken);
+        v.stgn = new STGN(params.governance, address(v.ifo), 1e26, 5e25, v.vesting, params.vestingAmount);
+        v.ifo.setup(address(v.c), address(v.stgn), params.rewardToken);
 
-        for (uint i; i < len; ++i) {
-            Vesting(vesting[i]).setup(
-                address(stgn), params.vestingPeriod, params.vestingCliff, params.vestingClaimant[i]
+        for (uint i; i < v.len; ++i) {
+            Vesting(v.vesting[i]).setup(
+                address(v.stgn), params.vestingPeriod, params.vestingCliff, params.vestingClaimant[i]
             );
         }
 
@@ -44,18 +54,19 @@ library DeployLib {
         address impl = address(new VeSTGN());
         proxy.initProxy(impl);
         VeSTGN ve = VeSTGN(address(proxy));
-        ve.init(address(stgn), 1e18, address(_c));
+        ve.init(address(v.stgn), 1e18, address(v.c));
         // assertEq(IProxyControlled(proxy).implementation(), impl);
+
 
         proxy = new ControllableProxy();
         impl = address(new MultiGauge());
         proxy.initProxy(impl);
         MultiGauge multigauge = MultiGauge(address(proxy));
-        multigauge.init(address(_c), address(ve), address(stgn));
+        multigauge.init(address(v.c), address(ve), address(v.stgn));
 
-        _c.setup(address(ifo), address(ve), address(stgn), address(multigauge));
+        v.c.setup(address(v.ifo), address(ve), address(v.stgn), address(multigauge), params.liquidator);
 
-        return address(_c);
+        return address(v.c);
     }
 
     function testDeployLib() external {}

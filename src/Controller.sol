@@ -59,7 +59,7 @@ contract Controller is IController {
         _operators.add(governance_);
     }
 
-    function setup(address ifo_, address ve_, address stgn_, address multigauge_) external {
+    function setup(address ifo_, address ve_, address stgn_, address multigauge_, address liquidator_) external {
         require(
             ifo_ != address(0) && stgn_ != address(0) && multigauge_ != address(0) && ve_ != address(0), "WRONG_INPUT"
         );
@@ -68,6 +68,7 @@ contract Controller is IController {
         ve = ve_;
         stgn = stgn_;
         multigauge = multigauge_;
+        liquidator = liquidator_;// todo event
     }
 
     /*´:°•.°+.*•´.*:˚.°*.˚•´.°:°•.°•.*•´.*:˚.°*.˚•´.°:°•.°+.*•´.*:*/
