@@ -35,18 +35,21 @@ contract PearlStrategy is StrategyStrictBase {
     address public compounder;
 
     constructor(address vault_, address gauge_, bool ifo_, address compounder_) StrategyStrictBase(vault_) {
-        vault = vault_;
-        asset = IVault(vault_).asset();
         gauge = gauge_;
         ifo = ifo_;
         compounder = compounder_;
         IERC20(asset).approve(gauge_, type(uint).max);
+        IController controller = IController(IVault(vault).controller());
         address _gaugeRewardToken = IPearlGaugeV2(gauge_).rewardToken();
         gaugeRewardToken = _gaugeRewardToken;
         if (ifo) {
-            IController controller = IController(IVault(vault).controller());
             IERC20(_gaugeRewardToken).approve(controller.ifo(), type(uint).max);
             IERC20(controller.stgn()).approve(controller.multigauge(), type(uint).max);
+        } else {
+            IERC20(_gaugeRewardToken).approve(controller.liquidator(), type(uint).max);
+            address compounderAsset = IERC4626(compounder_).asset();
+            IERC20(compounderAsset).approve(compounder_, type(uint).max);
+            IERC20(compounder_).approve(controller.multigauge(), type(uint).max);
         }
     }
 
@@ -72,13 +75,15 @@ contract PearlStrategy is StrategyStrictBase {
                 multigauge.notifyRewardAmount(vault, IPearlGaugeV2(gauge).rewardToken(), rtReward);
             }*/
         } else {
+            address _compounder = compounder;
             ITetuLiquidator l = ITetuLiquidator(controller.liquidator());
-            address asset = IERC4626(compounder).asset();
+            address asset = IERC4626(_compounder).asset();
             uint b = IERC20(asset).balanceOf(address(this));
-            l.liquidate(gaugeRewardToken, IERC4626(compounder).asset(), rtReward, 0);
+            l.liquidate(gaugeRewardToken, asset, rtReward, 0);
             uint got = IERC20(asset).balanceOf(address(this)) - b;
             if (got > 0) {
-                multigauge.notifyRewardAmount(vault, asset, got);
+                uint shares = IERC4626(_compounder).deposit(got, address(this));
+                multigauge.notifyRewardAmount(vault, _compounder, shares);
             }
         }
     }

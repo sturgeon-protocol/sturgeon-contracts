@@ -18,19 +18,25 @@ library PolygonLib {
         vestingAmount[1] = 375_000e18;
         vestingAmount[1] = 250_000e18;
 
-        Controller _c = Controller(DeployLib.deployPlatform(DeployLib.DeployParams({
-            governance: governance,
-            ifoRate: 12e17,
-            vestingClaimant: vestingClaimant,
-            vestingAmount:  vestingAmount,
-            vestingPeriod: 365 days,
-            vestingCliff: 180 days,
-            rewardToken: TOKEN_PEARL,
-            liquidator: address(0)
-        })));
+        Controller _c = Controller(
+            DeployLib.deployPlatform(
+                DeployLib.DeployParams({
+                    governance: governance,
+                    ifoRate: 12e17,
+                    vestingClaimant: vestingClaimant,
+                    vestingAmount: vestingAmount,
+                    vestingPeriod: 365 days,
+                    vestingCliff: 180 days,
+                    rewardToken: TOKEN_PEARL,
+                    liquidator: address(0)
+                })
+            )
+        );
 
         if (showLog) {
-            console.log('Deployed. Controller:', address(_c));
+            console.log("Deployed. Controller:", address(_c));
         }
     }
+
+    function testA() public {}
 }

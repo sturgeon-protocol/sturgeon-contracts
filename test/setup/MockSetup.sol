@@ -22,10 +22,12 @@ abstract contract MockSetup is Test {
     // LP 1
     address public tokenA;
 
-    // PEARL rewarding token
     address public tokenB;
 
+    // PEARL rewarding token
     address public tokenC;
+
+    // CVR (underlying of the first compounder vault)
     address public tokenD;
 
     IPearlGaugeV2 public pearlGauge;
