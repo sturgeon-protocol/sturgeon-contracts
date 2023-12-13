@@ -7,12 +7,8 @@ import "../src/HarvesterVault.sol";
 
 contract VaultTest is MockSetup {
     function test_vault() public {
-        HarvesterVault vault = new HarvesterVault(
-            address(controller),
-            IERC20(tokenA),
-            "Harvester vault for MOCK_A", "xTokenA",
-            4_000
-        );
+        HarvesterVault vault =
+            new HarvesterVault(address(controller), IERC20(tokenA), "Harvester vault for MOCK_A", "xTokenA", 4_000);
         MockStrategy strategy = new MockStrategy(address(vault), address(1));
         vault.setStrategy(address(strategy));
         IGauge(controller.multigauge()).addStakingToken(address(vault));
