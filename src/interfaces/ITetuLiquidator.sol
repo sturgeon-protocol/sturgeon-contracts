@@ -2,7 +2,6 @@
 pragma solidity ^0.8.21;
 
 interface ITetuLiquidator {
-
     struct PoolData {
         address pool;
         address swapper;
@@ -21,17 +20,7 @@ interface ITetuLiquidator {
         address tokenOut
     ) external view returns (PoolData[] memory route, string memory errorMessage);
 
-    function liquidate(
-        address tokenIn,
-        address tokenOut,
-        uint amount,
-        uint priceImpactTolerance
-    ) external;
+    function liquidate(address tokenIn, address tokenOut, uint amount, uint priceImpactTolerance) external;
 
-    function liquidateWithRoute(
-        PoolData[] memory route,
-        uint amount,
-        uint priceImpactTolerance
-    ) external;
-
+    function liquidateWithRoute(PoolData[] memory route, uint amount, uint priceImpactTolerance) external;
 }

@@ -9,7 +9,8 @@ import "../src/Compounder.sol";
 
 contract PearlStrategyTest is MockSetup {
     function test_ifo() public {
-        HarvesterVault vault = new HarvesterVault(address(controller), IERC20(tokenA), "IFO Harvester MOCK_A", "xTokenA", 4_000);
+        HarvesterVault vault =
+            new HarvesterVault(address(controller), IERC20(tokenA), "IFO Harvester MOCK_A", "xTokenA", 4_000);
         PearlStrategy strategy = new PearlStrategy(address(vault), address(pearlGauge), true, address(0));
         vault.setStrategy(address(strategy));
         IGauge(controller.multigauge()).addStakingToken(address(vault));
@@ -46,9 +47,11 @@ contract PearlStrategyTest is MockSetup {
     }
 
     function test_compounder() public {
-        HarvesterVault vault = new HarvesterVault(address(controller), IERC20(tokenA), "Harvester MOCK_A", "xTokenA", 4_000);
+        HarvesterVault vault =
+            new HarvesterVault(address(controller), IERC20(tokenA), "Harvester MOCK_A", "xTokenA", 4_000);
 
-        CompounderVault compounderVault = new CompounderVault(IERC20(address(vault)), "Compounder vault for xTokenA", "xxTokenA");
+        CompounderVault compounderVault =
+            new CompounderVault(IERC20(address(vault)), "Compounder vault for xTokenA", "xxTokenA");
 
         PearlStrategy strategy = new PearlStrategy(address(vault), address(pearlGauge), false, address(compounderVault));
         vault.setStrategy(address(strategy));
@@ -61,7 +64,6 @@ contract PearlStrategyTest is MockSetup {
         assertEq(vault.balanceOf(address(this)), 1e18);
 
         strategy.doHardWork();
-
     }
 
     function _getStgnRewardFromIfoGauge(address vault) internal returns (uint claimedStgn) {

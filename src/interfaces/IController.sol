@@ -2,7 +2,6 @@
 pragma solidity ^0.8.21;
 
 interface IController {
-
     event ProxyUpgradeAnnounced(address proxy, address implementation);
     event ProxyUpgraded(address proxy, address implementation);
     event ProxyAnnounceRemoved(address proxy);

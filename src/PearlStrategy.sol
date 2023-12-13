@@ -68,7 +68,7 @@ contract PearlStrategy is StrategyStrictBase {
             (bool exchanged, uint got) = _ifo.exchange(rtReward);
             if (exchanged && got > 0) {
                 multigauge.notifyRewardAmount(vault, controller.stgn(), got);
-            }/* else {
+            } /* else {
                 multigauge.notifyRewardAmount(vault, IPearlGaugeV2(gauge).rewardToken(), rtReward);
             }*/
         } else {

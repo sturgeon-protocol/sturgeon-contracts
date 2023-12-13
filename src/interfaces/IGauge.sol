@@ -2,7 +2,7 @@
 pragma solidity ^0.8.21;
 
 interface IGauge {
-    function veIds(address stakingToken, address account) external view returns (uint);
+    //    function veIds(address stakingToken, address account) external view returns (uint);
 
     function getReward(address stakingToken, address account, address[] memory tokens) external;
 
@@ -10,9 +10,9 @@ interface IGauge {
 
     function getAllRewardsForTokens(address[] memory stakingTokens, address account) external;
 
-    function attachVe(address stakingToken, address account, uint veId) external;
+    //    function attachVe(address stakingToken, address account, uint veId) external;
 
-    function detachVe(address stakingToken, address account, uint veId) external;
+    //    function detachVe(address stakingToken, address account, uint veId) external;
 
     function handleBalanceChange(address account) external;
 

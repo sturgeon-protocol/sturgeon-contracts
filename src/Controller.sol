@@ -68,7 +68,7 @@ contract Controller is IController {
         ve = ve_;
         stgn = stgn_;
         multigauge = multigauge_;
-        liquidator = liquidator_;// todo event
+        liquidator = liquidator_; // todo event
     }
 
     /*´:°•.°+.*•´.*:˚.°*.˚•´.°:°•.°•.*•´.*:˚.°*.˚•´.°:°•.°+.*•´.*:*/

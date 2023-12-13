@@ -57,12 +57,11 @@ library DeployLib {
         ve.init(address(v.stgn), 1e18, address(v.c));
         // assertEq(IProxyControlled(proxy).implementation(), impl);
 
-
         proxy = new ControllableProxy();
         impl = address(new MultiGauge());
         proxy.initProxy(impl);
         MultiGauge multigauge = MultiGauge(address(proxy));
-        multigauge.init(address(v.c), address(ve), address(v.stgn));
+        multigauge.init(address(v.c), /* address(ve),*/ address(v.stgn));
 
         v.c.setup(address(v.ifo), address(ve), address(v.stgn), address(multigauge), params.liquidator);
 

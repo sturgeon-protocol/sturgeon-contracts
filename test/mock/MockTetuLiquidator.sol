@@ -16,21 +16,12 @@ contract MockTetuLiquidator is ITetuLiquidator {
         address tokenOut
     ) external view returns (PoolData[] memory route, string memory errorMessage) {}
 
-    function liquidate(
-        address tokenIn,
-        address tokenOut,
-        uint amount,
-        uint /*priceImpactTolerance*/
-    ) external {
+    function liquidate(address tokenIn, address tokenOut, uint amount, uint /*priceImpactTolerance*/ ) external {
         uint amountOut = amount / 10;
         require(IERC20(tokenOut).balanceOf(address(this)) >= amountOut, "MockLiquidator: not enough balance");
         IERC20(tokenIn).transferFrom(msg.sender, address(this), amount);
         IERC20(tokenOut).transfer(msg.sender, amountOut);
     }
 
-    function liquidateWithRoute(
-        PoolData[] memory route,
-        uint amount,
-        uint priceImpactTolerance
-    ) external {}
+    function liquidateWithRoute(PoolData[] memory route, uint amount, uint priceImpactTolerance) external {}
 }

@@ -149,7 +149,7 @@ contract HarvesterVault is ERC4626, ReentrancyGuard, IVault {
     /*.•°:°.´+˚.*°.˚:*.´•*.+°.•°:´*.´•*.•°.•°:°.´:•˚°.*°.˚:*.´+°.•*/
 
     /// @dev Calculate available to invest amount and send this amount to strategy
-    function _afterDeposit(uint /*assets*/, uint /*shares*/, address receiver) internal {
+    function _afterDeposit(uint, /*assets*/ uint, /*shares*/ address receiver) internal {
         IStrategyStrict _strategy = strategy;
         IERC20 asset_ = IERC20(asset());
 

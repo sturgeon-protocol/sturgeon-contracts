@@ -27,7 +27,7 @@ contract MockPearlGaugeV2 {
 
     ///@notice withdraw a certain amount of TOKEN
     function withdraw(uint amount) external {
-//        require(amount <= balanceOf[msg.sender], "MockPearlGaugeV2: not enough balance");
+        //        require(amount <= balanceOf[msg.sender], "MockPearlGaugeV2: not enough balance");
         IERC20(TOKEN).transfer(msg.sender, amount);
         balanceOf[msg.sender] -= amount;
     }
