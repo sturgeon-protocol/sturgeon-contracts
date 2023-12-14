@@ -7,39 +7,37 @@ import "openzeppelin-contracts/contracts/utils/math/Math.sol";
 import "openzeppelin-contracts/contracts/utils/ReentrancyGuard.sol";
 import "./interfaces/IStrategyStrict.sol";
 import "./interfaces/IVault.sol";
+import "./interfaces/IController.sol";
+import "./interfaces/IGauge.sol";
 
-/// @title ERC4626 tokenized vault implementation for Sturgeon strategies
+/// @title Harvester ERC4626 tokenized vault implementation
 /// @author a17
-contract Vault is ERC4626, ReentrancyGuard, IVault {
+contract HarvesterVault is ERC4626, ReentrancyGuard, IVault {
     using SafeERC20 for IERC20;
     using Math for uint;
 
-    // *************************************************************
-    //                        CONSTANTS
-    // *************************************************************
+    /*´:°•.°+.*•´.*:˚.°*.˚•´.°:°•.°•.*•´.*:˚.°*.˚•´.°:°•.°+.*•´.*:*/
+    /*                         CONSTANTS                          */
+    /*.•°:°.´+˚.*°.˚:*.´•*.+°.•°:´*.´•*.•°.•°:°.´:•˚°.*°.˚:*.´+°.•*/
 
     /// @dev Denominator for buffer calculation. 100% of the buffer amount.
     uint public constant BUFFER_DENOMINATOR = 100_000;
 
-    // *************************************************************
-    //                        VARIABLES
-    // *************************************************************
+    /*´:°•.°+.*•´.*:˚.°*.˚•´.°:°•.°•.*•´.*:˚.°*.˚•´.°:°•.°+.*•´.*:*/
+    /*                          STORAGE                           */
+    /*.•°:°.´+˚.*°.˚:*.´•*.+°.•°:´*.´•*.•°.•°:°.´:•˚°.*°.˚:*.´+°.•*/
 
-    /// @dev Connected strategy. Can not be changed.
     address public controller;
+
+    /// @inheritdoc IVault
     IStrategyStrict public strategy;
+
     /// @dev Percent of assets that will always stay in this vault.
     uint public immutable buffer;
 
-    // *************************************************************
-    //                        EVENTS
-    // *************************************************************
-
-    event Invest(address splitter, uint amount);
-
-    // *************************************************************
-    //                        INIT
-    // *************************************************************
+    /*´:°•.°+.*•´.*:˚.°*.˚•´.°:°•.°•.*•´.*:˚.°*.˚•´.°:°•.°+.*•´.*:*/
+    /*                      INITIALIZATION                        */
+    /*.•°:°.´+˚.*°.˚:*.´•*.+°.•°:´*.´•*.•°.•°:°.´:•˚°.*°.˚:*.´+°.•*/
 
     constructor(
         address controller_,
@@ -59,78 +57,25 @@ contract Vault is ERC4626, ReentrancyGuard, IVault {
         strategy = IStrategyStrict(strategy_);
     }
 
-    // *************************************************************
-    //                        VIEWS
-    // *************************************************************
+    /*´:°•.°+.*•´.*:˚.°*.˚•´.°:°•.°•.*•´.*:˚.°*.˚•´.°:°•.°+.*•´.*:*/
+    /*                         USER ACTIONS                       */
+    /*.•°:°.´+˚.*°.˚:*.´•*.+°.•°:´*.´•*.•°.•°:°.´:•˚°.*°.˚:*.´+°.•*/
 
-    /// @dev Total amount of the underlying asset that is “managed” by Vault
-    function totalAssets() public view override(ERC4626, IERC4626) returns (uint) {
-        return IERC20(asset()).balanceOf(address(this)) + strategy.totalAssets();
-    }
-
-    /// @dev Amount of assets under control of strategy.
-    function strategyAssets() external view returns (uint) {
-        return strategy.totalAssets();
-    }
-
-    /// @dev Price of 1 full share
-    function sharePrice() external view returns (uint) {
-        uint units = 10 ** uint(decimals());
-        uint totalSupply_ = totalSupply();
-        return totalSupply_ == 0 ? units : units * totalAssets() / totalSupply_;
-    }
-
-    // *************************************************************
-    //                 DEPOSIT LOGIC
-    // *************************************************************
-
+    /// @inheritdoc IERC4626
     function deposit(uint assets, address receiver) public override(ERC4626, IERC4626) nonReentrant returns (uint) {
         uint shares = super.deposit(assets, receiver);
-        _afterDeposit(assets, shares);
+        _afterDeposit(assets, shares, receiver);
         return shares;
     }
 
+    /// @inheritdoc IERC4626
     function mint(uint shares, address receiver) public override(ERC4626, IERC4626) nonReentrant returns (uint) {
         uint assets = super.mint(shares, receiver);
-        _afterDeposit(assets, shares);
+        _afterDeposit(assets, shares, receiver);
         return assets;
     }
 
-    /// @dev Calculate available to invest amount and send this amount to strategy
-    function _afterDeposit(uint, /*assets*/ uint /*shares*/ ) internal {
-        IStrategyStrict _strategy = strategy;
-        IERC20 asset_ = IERC20(asset());
-
-        uint toInvest = _availableToInvest(_strategy, asset_);
-        // invest only when buffer is filled
-        if (toInvest > 0) {
-            asset_.safeTransfer(address(_strategy), toInvest);
-            _strategy.investAll();
-            emit Invest(address(_strategy), toInvest);
-        }
-    }
-
-    /// @notice Returns amount of assets ready to invest to the strategy
-    function _availableToInvest(IStrategyStrict _strategy, IERC20 asset_) internal view returns (uint) {
-        uint _buffer = buffer;
-        uint assetsInVault = asset_.balanceOf(address(this));
-        uint assetsInStrategy = _strategy.totalAssets();
-        uint wantInvestTotal = (assetsInVault + assetsInStrategy) * (BUFFER_DENOMINATOR - _buffer) / BUFFER_DENOMINATOR;
-        if (assetsInStrategy >= wantInvestTotal) {
-            return 0;
-        } else {
-            uint remainingToInvest = wantInvestTotal - assetsInStrategy;
-            return remainingToInvest <= assetsInVault ? remainingToInvest : assetsInVault;
-        }
-    }
-
-    // *************************************************************
-    //                 WITHDRAW LOGIC
-    // *************************************************************
-
-    /**
-     * @dev See {IERC4626-withdraw}.
-     */
+    /// @inheritdoc IERC4626
     function withdraw(
         uint assets,
         address receiver,
@@ -150,9 +95,7 @@ contract Vault is ERC4626, ReentrancyGuard, IVault {
         return shares;
     }
 
-    /**
-     * @dev See {IERC4626-redeem}.
-     */
+    /// @inheritdoc IERC4626
     function redeem(
         uint shares,
         address receiver,
@@ -178,6 +121,61 @@ contract Vault is ERC4626, ReentrancyGuard, IVault {
     ///      It suppose to be used only on UI - for on-chain interactions withdraw concrete amount with properly checks.
     function withdrawAll() external {
         redeem(balanceOf(msg.sender), msg.sender, msg.sender);
+    }
+
+    /*´:°•.°+.*•´.*:˚.°*.˚•´.°:°•.°•.*•´.*:˚.°*.˚•´.°:°•.°+.*•´.*:*/
+    /*                      VIEW FUNCTIONS                        */
+    /*.•°:°.´+˚.*°.˚:*.´•*.+°.•°:´*.´•*.•°.•°:°.´:•˚°.*°.˚:*.´+°.•*/
+
+    /// @dev Total amount of the underlying asset that is “managed” by Vault
+    function totalAssets() public view override(ERC4626, IERC4626) returns (uint) {
+        return IERC20(asset()).balanceOf(address(this)) + strategy.totalAssets();
+    }
+
+    /// @dev Amount of assets under control of strategy.
+    function strategyAssets() external view returns (uint) {
+        return strategy.totalAssets();
+    }
+
+    /// @dev Price of 1 full share
+    function sharePrice() external view returns (uint) {
+        uint units = 10 ** uint(decimals());
+        uint totalSupply_ = totalSupply();
+        return totalSupply_ == 0 ? units : units * totalAssets() / totalSupply_;
+    }
+
+    /*´:°•.°+.*•´.*:˚.°*.˚•´.°:°•.°•.*•´.*:˚.°*.˚•´.°:°•.°+.*•´.*:*/
+    /*                       INTERNAL LOGIC                       */
+    /*.•°:°.´+˚.*°.˚:*.´•*.+°.•°:´*.´•*.•°.•°:°.´:•˚°.*°.˚:*.´+°.•*/
+
+    /// @dev Calculate available to invest amount and send this amount to strategy
+    function _afterDeposit(uint, /*assets*/ uint, /*shares*/ address receiver) internal {
+        IStrategyStrict _strategy = strategy;
+        IERC20 asset_ = IERC20(asset());
+
+        uint toInvest = _availableToInvest(_strategy, asset_);
+        // invest only when buffer is filled
+        if (toInvest > 0) {
+            asset_.safeTransfer(address(_strategy), toInvest);
+            _strategy.investAll();
+            emit Invest(address(_strategy), toInvest);
+
+            IGauge(IController(controller).multigauge()).handleBalanceChange(receiver);
+        }
+    }
+
+    /// @notice Returns amount of assets ready to invest to the strategy
+    function _availableToInvest(IStrategyStrict _strategy, IERC20 asset_) internal view returns (uint) {
+        uint _buffer = buffer;
+        uint assetsInVault = asset_.balanceOf(address(this));
+        uint assetsInStrategy = _strategy.totalAssets();
+        uint wantInvestTotal = (assetsInVault + assetsInStrategy) * (BUFFER_DENOMINATOR - _buffer) / BUFFER_DENOMINATOR;
+        if (assetsInStrategy >= wantInvestTotal) {
+            return 0;
+        } else {
+            uint remainingToInvest = wantInvestTotal - assetsInStrategy;
+            return remainingToInvest <= assetsInVault ? remainingToInvest : assetsInVault;
+        }
     }
 
     /// @dev Internal hook for getting necessary assets from strategy.

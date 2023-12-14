@@ -12,17 +12,31 @@ import "../../src/VeDistributor.sol";
 import "../../src/Vesting.sol";
 import "../../script/lib/DeployLib.sol";
 import "../mock/MockERC20.sol";
+import "../../src/interfaces/IPearlGaugeV2.sol";
+import "../mock/MockPearlGaugeV2.sol";
+import "../mock/MockTetuLiquidator.sol";
 
 abstract contract MockSetup is Test {
     Controller public controller;
+
+    // LP 1
     address public tokenA;
+
     address public tokenB;
+
+    // PEARL rewarding token
     address public tokenC;
+
+    // CVR (underlying of the first compounder vault)
+    address public tokenD;
+
+    IPearlGaugeV2 public pearlGauge;
 
     constructor() {
         tokenA = address(new MockERC20("Mock Token A", "MOCK_A", 18));
         tokenB = address(new MockERC20("Mock Token B", "MOCK_B", 6));
         tokenC = address(new MockERC20("Mock Token C", "MOCK_C", 18));
+        tokenD = address(new MockERC20("Mock Token D", "MOCK_D", 18));
         controller = _init();
     }
 
@@ -43,10 +57,14 @@ abstract contract MockSetup is Test {
                     vestingAmount: vestingAmount,
                     vestingPeriod: 365 days,
                     vestingCliff: 30 days,
-                    rewardToken: tokenC
+                    rewardToken: tokenC,
+                    liquidator: address(new MockTetuLiquidator())
                 })
             )
         );
+
+        // mock gauge
+        pearlGauge = IPearlGaugeV2(address(new MockPearlGaugeV2(tokenA, tokenC)));
 
         return _c;
     }

@@ -139,11 +139,11 @@ contract Compounder is Controllable {
 
         IController _controller = IController(controller());
         uint _delay = delay;
-        uint vaultsLength = _controller.vaultsListLength();
+        uint vaultsLength = _controller.harvesterVaultsListLength();
         address[] memory _vaults = new address[](vaultsLength);
         uint counter;
         for (uint i; i < vaultsLength; ++i) {
-            address vault = _controller.vaults(i);
+            address vault = _controller.harvesterVaults(i);
             if (!excludedVaults[vault]) {
                 bool strategyNeedHardwork;
                 IStrategyStrict strategy = IVault(vault).strategy();

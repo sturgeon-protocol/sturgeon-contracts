@@ -4,11 +4,11 @@ pragma solidity ^0.8.21;
 import "openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol";
 import "./interfaces/IController.sol";
 import "./interfaces/IIFO.sol";
+import "./interfaces/IStrategyStrict.sol";
 
 contract IFO is IIFO {
     using SafeERC20 for IERC20;
 
-    // todo implement
     // This contract should contain all preminted STGN and allowing to change them to LP rewards until tokens exists on the balance.
     // The exchange will be done by a fixed rate that setup on deploy. Will be not changed later.
     // Rewards will be sent directly to governance.
@@ -32,7 +32,8 @@ contract IFO is IIFO {
     }
 
     function exchange(uint amount) external returns (bool, uint) {
-        require(IController(controller).isValidVault(msg.sender), "Not valid vault");
+        address vault = IStrategyStrict(msg.sender).vault();
+        require(IController(controller).isValidVault(vault), "Not valid vault");
         uint stgnBal = IERC20(stgn).balanceOf(address(this));
         uint stgnOut = amount * rate / 1e18;
         if (stgnOut <= stgnBal) {

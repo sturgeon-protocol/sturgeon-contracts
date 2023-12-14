@@ -7,6 +7,7 @@ import "./interfaces/IPearlGaugeV2.sol";
 import "./interfaces/IController.sol";
 import "./interfaces/IIFO.sol";
 import "./interfaces/IGauge.sol";
+import "./interfaces/ITetuLiquidator.sol";
 
 /*´:°•.°+.*•´.*:˚.°*.˚•´.°:°•.°•.*•´.°:°•.°+.*•´.*:*.°:°•.°•.*•´.*:˚.°*.˚•´.°:°•.°+.*•´.*/
 /*                                 Pearl strategy                                       */
@@ -27,14 +28,29 @@ contract PearlStrategy is StrategyStrictBase {
 
     address public gauge;
 
-    bool public harvester;
+    address public gaugeRewardToken;
 
-    constructor(address vault_, address gauge_, bool harvester_) StrategyStrictBase(vault_) {
-        vault = vault_;
-        asset = IVault(vault_).asset();
+    bool public ifo;
+
+    address public compounder;
+
+    constructor(address vault_, address gauge_, bool ifo_, address compounder_) StrategyStrictBase(vault_) {
         gauge = gauge_;
-        harvester = harvester_;
+        ifo = ifo_;
+        compounder = compounder_;
         IERC20(asset).approve(gauge_, type(uint).max);
+        IController controller = IController(IVault(vault).controller());
+        address _gaugeRewardToken = IPearlGaugeV2(gauge_).rewardToken();
+        gaugeRewardToken = _gaugeRewardToken;
+        if (ifo) {
+            IERC20(_gaugeRewardToken).approve(controller.ifo(), type(uint).max);
+            IERC20(controller.stgn()).approve(controller.multigauge(), type(uint).max);
+        } else {
+            IERC20(_gaugeRewardToken).approve(controller.liquidator(), type(uint).max);
+            address compounderAsset = IERC4626(compounder_).asset();
+            IERC20(compounderAsset).approve(compounder_, type(uint).max);
+            IERC20(compounder_).approve(controller.multigauge(), type(uint).max);
+        }
     }
 
     function isReadyToHardWork() external view returns (bool) {
@@ -49,17 +65,26 @@ contract PearlStrategy is StrategyStrictBase {
 
         IController controller = IController(IVault(vault).controller());
 
-        if (harvester) {
-            IIFO ifo = IIFO(controller.ifo());
-            IGauge multigauge = IGauge(controller.multigauge());
-            (bool exchanged, uint got) = ifo.exchange(rtReward);
-            if (exchanged) {
+        IGauge multigauge = IGauge(controller.multigauge());
+        if (ifo) {
+            IIFO _ifo = IIFO(controller.ifo());
+            (bool exchanged, uint got) = _ifo.exchange(rtReward);
+            if (exchanged && got > 0) {
                 multigauge.notifyRewardAmount(vault, controller.stgn(), got);
-            } else {
+            } /* else {
                 multigauge.notifyRewardAmount(vault, IPearlGaugeV2(gauge).rewardToken(), rtReward);
-            }
+            }*/
         } else {
-            // todo Compounder CVR
+            address _compounder = compounder;
+            ITetuLiquidator l = ITetuLiquidator(controller.liquidator());
+            address asset = IERC4626(_compounder).asset();
+            uint b = IERC20(asset).balanceOf(address(this));
+            l.liquidate(gaugeRewardToken, asset, rtReward, 0);
+            uint got = IERC20(asset).balanceOf(address(this)) - b;
+            if (got > 0) {
+                uint shares = IERC4626(_compounder).deposit(got, address(this));
+                multigauge.notifyRewardAmount(vault, _compounder, shares);
+            }
         }
     }
 
@@ -68,8 +93,7 @@ contract PearlStrategy is StrategyStrictBase {
     }
 
     function _claim() internal override returns (uint rtReward) {
-        IPearlGaugeV2 _gauge = IPearlGaugeV2(gauge);
-        IERC20 rt = IERC20(_gauge.rewardToken());
+        IERC20 rt = IERC20(gaugeRewardToken);
         uint oldBal = rt.balanceOf(address(this));
         IPearlGaugeV2(gauge).getReward();
         rtReward = rt.balanceOf(address(this)) - oldBal;

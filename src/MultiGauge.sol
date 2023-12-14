@@ -23,9 +23,9 @@ contract MultiGauge is StakelessMultiPoolBase, IGauge {
     // *************************************************************
 
     /// @dev The ve token used for gauges
-    address public ve;
+    //    address public ve;
     /// @dev staking token => ve owner => veId
-    mapping(address => mapping(address => uint)) public override veIds;
+    //    mapping(address => mapping(address => uint)) public override veIds;
     /// @dev Staking token => whitelist status
     mapping(address => bool) public stakingTokens;
 
@@ -35,7 +35,7 @@ contract MultiGauge is StakelessMultiPoolBase, IGauge {
 
     event AddStakingToken(address token);
     event Deposit(address indexed stakingToken, address indexed account, uint amount);
-    event Withdraw(address indexed stakingToken, address indexed account, uint amount, bool full, uint veId);
+    event Withdraw( /*, uint veId*/ address indexed stakingToken, address indexed account, uint amount, bool full);
     event VeTokenLocked(address indexed stakingToken, address indexed account, uint tokenId);
     event VeTokenUnlocked(address indexed stakingToken, address indexed account, uint tokenId);
 
@@ -43,9 +43,9 @@ contract MultiGauge is StakelessMultiPoolBase, IGauge {
     //                        INIT
     // *************************************************************
 
-    function init(address controller_, address _ve, address _defaultRewardToken) external initializer {
+    function init(address controller_, address _defaultRewardToken) external initializer {
         __MultiPool_init(controller_, _defaultRewardToken, 7 days);
-        ve = _ve;
+        //        ve = _ve;
     }
 
     // *************************************************************
@@ -96,7 +96,7 @@ contract MultiGauge is StakelessMultiPoolBase, IGauge {
     //                   VIRTUAL DEPOSIT/WITHDRAW
     // *************************************************************
 
-    function attachVe(address stakingToken, address account, uint veId) external override {
+    /*function attachVe(address stakingToken, address account, uint veId) external override {
         require(IERC721(ve).ownerOf(veId) == account && account == msg.sender, "Not ve token owner");
         require(isStakeToken(stakingToken), "Wrong staking token");
 
@@ -109,9 +109,9 @@ contract MultiGauge is StakelessMultiPoolBase, IGauge {
         _updateDerivedBalance(stakingToken, account);
         _updateRewardForAllTokens(stakingToken, account);
         emit VeTokenLocked(stakingToken, account, veId);
-    }
+    }*/
 
-    function detachVe(address stakingToken, address account, uint veId) external override {
+    /*function detachVe(address stakingToken, address account, uint veId) external override {
         require(
             (IERC721(ve).ownerOf(veId) == account && msg.sender == account)
                 || msg.sender == address(IController(controller()).ifo()),
@@ -122,7 +122,7 @@ contract MultiGauge is StakelessMultiPoolBase, IGauge {
         _unlockVeToken(stakingToken, account, veId);
         _updateDerivedBalance(stakingToken, account);
         _updateRewardForAllTokens(stakingToken, account);
-    }
+    }*/
 
     /// @dev Must be called from stakingToken when user balance changed.
     function handleBalanceChange(address account) external override {
@@ -144,24 +144,24 @@ contract MultiGauge is StakelessMultiPoolBase, IGauge {
     }
 
     function _withdraw(address stakingToken, address account, uint amount, bool fullWithdraw) internal {
-        uint veId = 0;
-        if (fullWithdraw) {
+        //        uint veId = 0;
+        /*if (fullWithdraw) {
             veId = veIds[stakingToken][account];
         }
         if (veId > 0) {
             _unlockVeToken(stakingToken, account, veId);
-        }
+        }*/
         _registerBalanceDecreasing(stakingToken, account, amount);
-        emit Withdraw(stakingToken, account, amount, fullWithdraw, veId);
+        emit Withdraw(stakingToken, account, amount, fullWithdraw /*, veId*/ );
     }
 
     /// @dev Balance should be recalculated after the unlock
-    function _unlockVeToken(address stakingToken, address account, uint veId) internal {
+    /*function _unlockVeToken(address stakingToken, address account, uint veId) internal {
         require(veId == veIds[stakingToken][account], "Wrong ve");
         veIds[stakingToken][account] = 0;
         //    voter().detachTokenFromGauge(stakingToken, veId, account);
         emit VeTokenUnlocked(stakingToken, account, veId);
-    }
+    }*/
 
     // *************************************************************
     //                   LOGIC OVERRIDES
@@ -169,7 +169,8 @@ contract MultiGauge is StakelessMultiPoolBase, IGauge {
 
     /// @dev Similar to Curve https://resources.curve.fi/reward-gauges/boosting-your-crv-rewards#formula
     function derivedBalance(address stakingToken, address account) public view override returns (uint) {
-        uint _tokenId = veIds[stakingToken][account];
+        return balanceOf[stakingToken][account];
+        /*uint _tokenId = veIds[stakingToken][account];
         uint _balance = balanceOf[stakingToken][account];
         uint _derived = _balance * 40 / 100;
         uint _adjusted = 0;
@@ -177,11 +178,7 @@ contract MultiGauge is StakelessMultiPoolBase, IGauge {
         if (account == IERC721(ve).ownerOf(_tokenId) && _supply > 0) {
             _adjusted = (totalSupply[stakingToken] * IVe(ve).balanceOfNFT(_tokenId) / _supply) * 60 / 100;
         }
-        return Math.min((_derived + _adjusted), _balance);
-    }
-
-    function isStakeToken(address token) public view override returns (bool) {
-        return stakingTokens[token];
+        return Math.min((_derived + _adjusted), _balance);*/
     }
 
     // *************************************************************
@@ -195,4 +192,8 @@ contract MultiGauge is StakelessMultiPoolBase, IGauge {
     // *************************************************************
     //                        VIEWS
     // *************************************************************
+
+    function isStakeToken(address token) public view override returns (bool) {
+        return stakingTokens[token];
+    }
 }
