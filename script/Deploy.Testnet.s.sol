@@ -13,7 +13,7 @@ contract DeployTestnet is Script {
     function run() external {
         uint deployerPrivateKey = vm.envUint("PRIVATE_KEY");
         vm.startBroadcast(deployerPrivateKey);
-        console.log('deployer', vm.addr(deployerPrivateKey));
+        console.log("deployer", vm.addr(deployerPrivateKey));
         IController controller = IController(TestnetLib.runDeploy(true));
 
         // deploy mocks
@@ -23,7 +23,8 @@ contract DeployTestnet is Script {
         IPearlGaugeV2 pearlGauge = IPearlGaugeV2(address(new MockPearlGaugeV2(tokenA, tokenC)));
 
         // deploy IFO harvester
-        HarvesterVault vault = new HarvesterVault(address(controller), IERC20(tokenA), "IFO Harvester MOCK_A", "xTokenA", 4_000);
+        HarvesterVault vault =
+            new HarvesterVault(address(controller), IERC20(tokenA), "IFO Harvester MOCK_A", "xTokenA", 4_000);
         PearlStrategy strategy = new PearlStrategy(address(vault), address(pearlGauge), true, address(0));
         vault.setStrategy(address(strategy));
         IGauge(controller.multigauge()).addStakingToken(address(vault));
@@ -31,7 +32,8 @@ contract DeployTestnet is Script {
         // deploy compounder + harvester
         vault = new HarvesterVault(address(controller), IERC20(tokenA), "Harvester MOCK_A", "xTokenA", 4_000);
 
-        CompounderVault compounderVault = new CompounderVault(IERC20(tokenD), "Compounder vault for xTokenA", "xxTokenA");
+        CompounderVault compounderVault =
+            new CompounderVault(IERC20(tokenD), "Compounder vault for xTokenA", "xxTokenA");
 
         strategy = new PearlStrategy(address(vault), address(pearlGauge), false, address(compounderVault));
         vault.setStrategy(address(strategy));
