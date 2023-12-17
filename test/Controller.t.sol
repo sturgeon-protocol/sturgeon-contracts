@@ -18,9 +18,9 @@ contract ControllerTest is Test, MockSetup {
         controller.registerOperator(address(2));
         controller.registerOperator(address(2));
         assertEq(controller.isOperator(address(2)), true);
-        assertEq(controller.operatorsList().length, 2);
+        assertEq(controller.operatorsList().length, 3);
         controller.removeOperator(address(2));
-        assertEq(controller.operatorsList().length, 1);
+        assertEq(controller.operatorsList().length, 2);
 
         controller.registerVault(address(3), true);
         assertEq(controller.harvesterVaultsListLength(), 1);

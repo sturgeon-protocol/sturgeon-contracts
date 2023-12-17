@@ -21,6 +21,8 @@ interface IController {
     /// @notice Gnosis safe multi signature wallet with maximum power under the platform.
     function governance() external view returns (address);
 
+    function factory() external view returns (address);
+
     function stgn() external view returns (address);
 
     /// @notice A dedicated solution for swap tokens via different chains.
@@ -69,7 +71,7 @@ interface IController {
     /// @return True if the vault valid
     function isValidVault(address vault) external view returns (bool);
 
-    // --- restrictions
+    function registerVault(address vault, bool isHarvester) external;
 
     function isOperator(address _adr) external view returns (bool);
 }

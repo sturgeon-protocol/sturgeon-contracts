@@ -99,7 +99,7 @@ abstract contract StakelessMultiPoolBase is ReentrancyGuard, IMultiPool, Control
     // *************************************************************
 
     modifier onlyAllowedContracts() {
-        _requireGovOrIfo();
+        _requireGovOrIfoOrFactory();
         _;
     }
 
@@ -339,8 +339,12 @@ abstract contract StakelessMultiPoolBase is ReentrancyGuard, IMultiPool, Control
         emit NotifyReward(msg.sender, stakingToken, rewardToken, amount);
     }
 
-    function _requireGovOrIfo() internal view {
+    function _requireGovOrIfoOrFactory() internal view {
         IController _controller = IController(controller());
-        require(msg.sender == _controller.governance() || msg.sender == _controller.ifo(), "Not allowed");
+        require(
+            msg.sender == _controller.governance() || msg.sender == _controller.ifo()
+                || msg.sender == _controller.factory(),
+            "Not allowed"
+        );
     }
 }

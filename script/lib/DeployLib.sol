@@ -9,6 +9,7 @@ import "../../src/STGN.sol";
 import "../../src/ControllableProxy.sol";
 import "../../src/VeSTGN.sol";
 import "../../src/MultiGauge.sol";
+import "../../src/Factory.sol";
 
 library DeployLib {
     struct DeployParams {
@@ -63,7 +64,15 @@ library DeployLib {
         MultiGauge multigauge = MultiGauge(address(proxy));
         multigauge.init(address(v.c), /* address(ve),*/ address(v.stgn));
 
-        v.c.setup(address(v.ifo), address(ve), address(v.stgn), address(multigauge), params.liquidator);
+        proxy = new ControllableProxy();
+        impl = address(new Factory());
+        proxy.initProxy(impl);
+        Factory factory = Factory(address(proxy));
+        factory.init(address(v.c));
+
+        v.c.setup(
+            address(factory), address(v.ifo), address(ve), address(v.stgn), address(multigauge), params.liquidator
+        );
 
         return address(v.c);
     }
