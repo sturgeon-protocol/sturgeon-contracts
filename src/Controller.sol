@@ -65,6 +65,7 @@ contract Controller is IController {
 
     function setup(
         address perfFeeTreasury_,
+        address veDistributor_,
         address factory_,
         address ifo_,
         address ve_,
@@ -77,6 +78,7 @@ contract Controller is IController {
         );
         require(ifo == address(0), "ALREADY");
         perfFeeTreasury = perfFeeTreasury_;
+        veDistributor = veDistributor_;
         factory = factory_;
         ifo = ifo_;
         ve = ve_;
