@@ -8,6 +8,7 @@ import "./interfaces/IController.sol";
 import "./interfaces/IIFO.sol";
 import "./interfaces/IGauge.sol";
 import "./interfaces/ITetuLiquidator.sol";
+import "./interfaces/IVeDistributor.sol";
 
 /*´:°•.°+.*•´.*:˚.°*.˚•´.°:°•.°•.*•´.°:°•.°+.*•´.*:*.°:°•.°•.*•´.*:˚.°*.˚•´.°:°•.°+.*•´.*/
 /*                                 Pearl strategy                                       */
@@ -62,8 +63,16 @@ contract PearlStrategy is StrategyStrictBase {
         // liquidate fee if available
 
         uint rtReward = _claim();
+        uint perfFee = rtReward / 10;
+        uint veDistFee = perfFee / 2;
+        rtReward -= perfFee;
+        IERC20 rt = IERC20(gaugeRewardToken);
 
         IController controller = IController(IVault(vault).controller());
+        IVeDistributor veDist = IVeDistributor(controller.veDistributor());
+        rt.safeTransfer(address(veDist), veDistFee);
+        veDist.checkpoint();
+        rt.safeTransfer(controller.perfFeeTreasury(), perfFee - veDistFee);
 
         IGauge multigauge = IGauge(controller.multigauge());
         if (ifo) {

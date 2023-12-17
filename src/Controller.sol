@@ -23,6 +23,10 @@ contract Controller is IController {
     /// @inheritdoc IController
     address public governance;
 
+    address public perfFeeTreasury;
+
+    address public factory;
+
     address public stgn;
 
     /// @dev External solution for sell any tokens with minimal gas usage.
@@ -59,16 +63,29 @@ contract Controller is IController {
         _operators.add(governance_);
     }
 
-    function setup(address ifo_, address ve_, address stgn_, address multigauge_, address liquidator_) external {
+    function setup(
+        address perfFeeTreasury_,
+        address veDistributor_,
+        address factory_,
+        address ifo_,
+        address ve_,
+        address stgn_,
+        address multigauge_,
+        address liquidator_
+    ) external {
         require(
             ifo_ != address(0) && stgn_ != address(0) && multigauge_ != address(0) && ve_ != address(0), "WRONG_INPUT"
         );
         require(ifo == address(0), "ALREADY");
+        perfFeeTreasury = perfFeeTreasury_;
+        veDistributor = veDistributor_;
+        factory = factory_;
         ifo = ifo_;
         ve = ve_;
         stgn = stgn_;
         multigauge = multigauge_;
-        liquidator = liquidator_; // todo event
+        liquidator = liquidator_;
+        _operators.add(factory_); // todo event
     }
 
     /*´:°•.°+.*•´.*:˚.°*.˚•´.°:°•.°•.*•´.*:˚.°*.˚•´.°:°•.°+.*•´.*:*/

@@ -9,6 +9,9 @@ import "../../src/STGN.sol";
 import "../../src/ControllableProxy.sol";
 import "../../src/VeSTGN.sol";
 import "../../src/MultiGauge.sol";
+import "../../src/Factory.sol";
+import "../../src/PerfFeeTreasury.sol";
+import "../../src/VeDistributor.sol";
 
 library DeployLib {
     struct DeployParams {
@@ -28,6 +31,9 @@ library DeployLib {
         uint len;
         address[] vesting;
         STGN stgn;
+        Factory factory;
+        address perfFeeTreasury;
+        VeDistributor veDist;
     }
 
     function deployPlatform(DeployParams memory params) internal returns (address controller) {
@@ -54,7 +60,7 @@ library DeployLib {
         address impl = address(new VeSTGN());
         proxy.initProxy(impl);
         VeSTGN ve = VeSTGN(address(proxy));
-        ve.init(address(v.stgn), 1e18, address(v.c));
+        ve.init(address(v.stgn), 100e18, address(v.c));
         // assertEq(IProxyControlled(proxy).implementation(), impl);
 
         proxy = new ControllableProxy();
@@ -63,7 +69,30 @@ library DeployLib {
         MultiGauge multigauge = MultiGauge(address(proxy));
         multigauge.init(address(v.c), /* address(ve),*/ address(v.stgn));
 
-        v.c.setup(address(v.ifo), address(ve), address(v.stgn), address(multigauge), params.liquidator);
+        proxy = new ControllableProxy();
+        impl = address(new Factory());
+        proxy.initProxy(impl);
+        v.factory = Factory(address(proxy));
+        v.factory.init(address(v.c));
+
+        v.perfFeeTreasury = address(new PerfFeeTreasury(params.governance));
+
+        proxy = new ControllableProxy();
+        impl = address(new VeDistributor());
+        proxy.initProxy(impl);
+        v.veDist = VeDistributor(address(proxy));
+        v.veDist.init(address(v.c), address(ve), params.rewardToken);
+
+        v.c.setup(
+            v.perfFeeTreasury,
+            address(v.veDist),
+            address(v.factory),
+            address(v.ifo),
+            address(ve),
+            address(v.stgn),
+            address(multigauge),
+            params.liquidator
+        );
 
         return address(v.c);
     }

@@ -413,9 +413,9 @@ library VeSTGNLib {
             bytes(
                 string(
                     abi.encodePacked(
-                        '{"name": "veTETU #',
+                        '{"name": "veSTGN #',
                         Strings.toString(_tokenId),
-                        '", "description": "Locked TETU tokens", "image": "data:image/svg+xml;base64,',
+                        '", "description": "Locked STGN tokens", "image": "data:image/svg+xml;base64,',
                         Base64.encode(bytes(output)),
                         '"}'
                     )
