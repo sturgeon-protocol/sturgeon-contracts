@@ -6,7 +6,7 @@ import "./setup/MockSetup.sol";
 contract PerfFeeTreasuryTest is MockSetup {
     function testPerfFeeTreasury() public {
         (address v, address s) =
-                            factory.deployIfoHarvester(tokenA, address(pearlGauge), "IFO Harvester MOCK_A", "xTokenA");
+            factory.deployIfoHarvester(tokenA, address(pearlGauge), "IFO Harvester MOCK_A", "xTokenA");
         IVault vault = IVault(v);
         IStrategyStrict strategy = IStrategyStrict(s);
 

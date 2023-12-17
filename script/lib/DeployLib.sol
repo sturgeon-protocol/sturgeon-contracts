@@ -76,7 +76,13 @@ library DeployLib {
         v.perfFeeTreasury = address(new PerfFeeTreasury(params.governance));
 
         v.c.setup(
-            v.perfFeeTreasury, address(v.factory), address(v.ifo), address(ve), address(v.stgn), address(multigauge), params.liquidator
+            v.perfFeeTreasury,
+            address(v.factory),
+            address(v.ifo),
+            address(ve),
+            address(v.stgn),
+            address(multigauge),
+            params.liquidator
         );
 
         return address(v.c);

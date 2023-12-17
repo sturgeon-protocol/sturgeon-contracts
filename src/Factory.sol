@@ -2,10 +2,10 @@
 pragma solidity ^0.8.21;
 
 import "./base/Controllable.sol";
-import "./HarvesterVault.sol";
 import "./CompounderVault.sol";
 import "./PearlStrategy.sol";
 import "./interfaces/IMultiPool.sol";
+import "./lib/DeployerLib.sol";
 
 contract Factory is Controllable {
     function init(address controller_) external initializer {
@@ -24,7 +24,7 @@ contract Factory is Controllable {
         string calldata vaultSymbol
     ) external onlyGovernance returns (address vault, address strategy) {
         address _controller = controller();
-        vault = address(new HarvesterVault(_controller, IERC20(underlying), vaultName, vaultSymbol, 4_000));
+        vault = DeployerLib.deployHarvesterVault(_controller, underlying, vaultName, vaultSymbol);
         strategy = address(new PearlStrategy(vault, pearlGauge, true, address(0)));
         IVault(vault).setStrategy(strategy);
         IGauge(IController(_controller).multigauge()).addStakingToken(vault);
@@ -47,7 +47,7 @@ contract Factory is Controllable {
         address compounderVault
     ) external onlyGovernance returns (address vault, address strategy) {
         address _controller = controller();
-        vault = address(new HarvesterVault(_controller, IERC20(underlying), vaultName, vaultSymbol, 4_000));
+        vault = DeployerLib.deployHarvesterVault(_controller, underlying, vaultName, vaultSymbol);
         strategy = address(new PearlStrategy(vault, pearlGauge, false, compounderVault));
         IVault(vault).setStrategy(strategy);
         address multigauge = IController(_controller).multigauge();
