@@ -19,6 +19,8 @@ import "../mock/MockTetuLiquidator.sol";
 abstract contract MockSetup is Test {
     Controller public controller;
 
+    Factory public factory;
+
     // LP 1
     address public tokenA;
 
@@ -38,6 +40,7 @@ abstract contract MockSetup is Test {
         tokenC = address(new MockERC20("Mock Token C", "MOCK_C", 18));
         tokenD = address(new MockERC20("Mock Token D", "MOCK_D", 18));
         controller = _init();
+        factory = Factory(controller.factory());
     }
 
     function _init() public returns (Controller) {

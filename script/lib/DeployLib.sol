@@ -10,6 +10,7 @@ import "../../src/ControllableProxy.sol";
 import "../../src/VeSTGN.sol";
 import "../../src/MultiGauge.sol";
 import "../../src/Factory.sol";
+import "../../src/PerfFeeTreasury.sol";
 
 library DeployLib {
     struct DeployParams {
@@ -29,6 +30,8 @@ library DeployLib {
         uint len;
         address[] vesting;
         STGN stgn;
+        Factory factory;
+        address perfFeeTreasury;
     }
 
     function deployPlatform(DeployParams memory params) internal returns (address controller) {
@@ -67,11 +70,13 @@ library DeployLib {
         proxy = new ControllableProxy();
         impl = address(new Factory());
         proxy.initProxy(impl);
-        Factory factory = Factory(address(proxy));
-        factory.init(address(v.c));
+        v.factory = Factory(address(proxy));
+        v.factory.init(address(v.c));
+
+        v.perfFeeTreasury = address(new PerfFeeTreasury(params.governance));
 
         v.c.setup(
-            address(factory), address(v.ifo), address(ve), address(v.stgn), address(multigauge), params.liquidator
+            v.perfFeeTreasury, address(v.factory), address(v.ifo), address(ve), address(v.stgn), address(multigauge), params.liquidator
         );
 
         return address(v.c);

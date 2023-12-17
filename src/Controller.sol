@@ -23,6 +23,8 @@ contract Controller is IController {
     /// @inheritdoc IController
     address public governance;
 
+    address public perfFeeTreasury;
+
     address public factory;
 
     address public stgn;
@@ -62,6 +64,7 @@ contract Controller is IController {
     }
 
     function setup(
+        address perfFeeTreasury_,
         address factory_,
         address ifo_,
         address ve_,
@@ -73,13 +76,14 @@ contract Controller is IController {
             ifo_ != address(0) && stgn_ != address(0) && multigauge_ != address(0) && ve_ != address(0), "WRONG_INPUT"
         );
         require(ifo == address(0), "ALREADY");
+        perfFeeTreasury = perfFeeTreasury_;
         factory = factory_;
         ifo = ifo_;
         ve = ve_;
         stgn = stgn_;
         multigauge = multigauge_;
-        liquidator = liquidator_; // todo event
-        _operators.add(factory_);
+        liquidator = liquidator_;
+        _operators.add(factory_); // todo event
     }
 
     /*´:°•.°+.*•´.*:˚.°*.˚•´.°:°•.°•.*•´.*:˚.°*.˚•´.°:°•.°+.*•´.*:*/

@@ -47,7 +47,6 @@ contract PearlStrategyTest is MockSetup {
     }
 
     function test_factory_ifo() public {
-        Factory factory = Factory(controller.factory());
         (address v, address s) =
             factory.deployIfoHarvester(tokenA, address(pearlGauge), "IFO Harvester MOCK_A", "xTokenA");
         IVault vault = IVault(v);
@@ -110,7 +109,6 @@ contract PearlStrategyTest is MockSetup {
     }
 
     function test_factory_compounder() public {
-        Factory factory = Factory(controller.factory());
         CompounderVault compounderVault =
             CompounderVault(factory.deployCompounder(tokenD, "Compounder vault for xTokenA", "xxTokenA"));
         (address v, address s) = factory.deployHarvester(

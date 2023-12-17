@@ -33,11 +33,12 @@ contract IFO is IIFO {
 
     function exchange(uint amount) external returns (bool, uint) {
         address vault = IStrategyStrict(msg.sender).vault();
-        require(IController(controller).isValidVault(vault), "Not valid vault");
+        IController _controller = IController(controller);
+        require(_controller.isValidVault(vault), "Not valid vault");
         uint stgnBal = IERC20(stgn).balanceOf(address(this));
         uint stgnOut = amount * rate / 1e18;
         if (stgnOut <= stgnBal) {
-            IERC20(rewardToken).safeTransferFrom(msg.sender, address(this), amount);
+            IERC20(rewardToken).safeTransferFrom(msg.sender, _controller.perfFeeTreasury(), amount);
             IERC20(stgn).safeTransfer(msg.sender, stgnOut);
             return (true, stgnOut);
         }

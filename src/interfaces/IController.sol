@@ -21,6 +21,8 @@ interface IController {
     /// @notice Gnosis safe multi signature wallet with maximum power under the platform.
     function governance() external view returns (address);
 
+    function perfFeeTreasury() external view returns (address);
+
     function factory() external view returns (address);
 
     function stgn() external view returns (address);
