@@ -41,6 +41,8 @@ abstract contract MockSetup is Test {
         tokenD = address(new MockERC20("Mock Token D", "MOCK_D", 18));
         controller = _init();
         factory = Factory(controller.factory());
+        MockTetuLiquidator l = MockTetuLiquidator(controller.liquidator());
+        l.setPrice(tokenC, tokenD, 2e18);
     }
 
     function _init() public returns (Controller) {

@@ -14,7 +14,6 @@ contract DeployTestnet is Script {
         uint deployerPrivateKey = vm.envUint("PRIVATE_KEY");
         vm.startBroadcast(deployerPrivateKey);
         console.log("deployer", vm.addr(deployerPrivateKey));
-        IController controller = IController(TestnetLib.runDeploy(true));
 
         // deploy mocks
         address tokenA = address(new MockERC20("Mock Token A", "MOCK_A", 18));
@@ -22,24 +21,16 @@ contract DeployTestnet is Script {
         address tokenD = address(new MockERC20("Mock Token D", "MOCK_D", 18));
         IPearlGaugeV2 pearlGauge = IPearlGaugeV2(address(new MockPearlGaugeV2(tokenA, tokenC)));
 
+        IController controller = IController(TestnetLib.runDeploy(tokenC, true));
+        Factory factory = Factory(controller.factory());
+
         // deploy IFO harvester
-        HarvesterVault vault =
-            new HarvesterVault(address(controller), IERC20(tokenA), "IFO Harvester MOCK_A", "xTokenA", 4_000);
-        PearlStrategy strategy = new PearlStrategy(address(vault), address(pearlGauge), true, address(0));
-        vault.setStrategy(address(strategy));
-        IGauge(controller.multigauge()).addStakingToken(address(vault));
+        factory.deployIfoHarvester(tokenA, address(pearlGauge), "IFO Harvester MOCK_A", "xTokenA");
 
         // deploy compounder + harvester
-        vault = new HarvesterVault(address(controller), IERC20(tokenA), "Harvester MOCK_A", "xTokenA", 4_000);
-
         CompounderVault compounderVault =
-            new CompounderVault(IERC20(tokenD), "Compounder vault for xTokenA", "xxTokenA");
-
-        strategy = new PearlStrategy(address(vault), address(pearlGauge), false, address(compounderVault));
-        vault.setStrategy(address(strategy));
-
-        IGauge(controller.multigauge()).addStakingToken(address(vault));
-        IMultiPool(controller.multigauge()).registerRewardToken(address(vault), address(compounderVault));
+            CompounderVault(factory.deployCompounder(tokenD, "Compounder vault for xTokenA", "xxTokenA"));
+        factory.deployHarvester(tokenA, address(pearlGauge), "Harvester MOCK_A", "xTokenA", address(compounderVault));
 
         vm.stopBroadcast();
     }

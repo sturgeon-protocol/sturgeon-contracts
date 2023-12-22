@@ -8,7 +8,7 @@ import "../test/mock/MockTetuLiquidator.sol";
 library TestnetLib {
     address public constant TOKEN_WETH = 0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9;
 
-    function runDeploy(bool showLog) internal returns(address) {
+    function runDeploy(address rewardToken, bool showLog) internal returns(address) {
         address governance = 0x3d0c177E035C30bb8681e5859EB98d114b48b935; // test deployer
         address[] memory vestingClaimant = new address[](3);
         uint[] memory vestingAmount = new uint[](3);
@@ -30,7 +30,7 @@ library TestnetLib {
                     vestingAmount: vestingAmount,
                     vestingPeriod: 365 days,
                     vestingCliff: 180 days,
-                    rewardToken: TOKEN_WETH,
+                    rewardToken: rewardToken,
                     liquidator: address(l)
                 })
             )
