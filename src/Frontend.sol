@@ -11,7 +11,11 @@ contract Frontend {
     IController public controller;
 
     struct LocalVars {
-        uint len;
+        address[] harvesters;
+        address[] compounders;
+        uint harvestersLen;
+        uint compoundersLen;
+        uint totalLen;
         address stgn;
         StakelessMultiPoolBase gauge;
     }
@@ -20,7 +24,7 @@ contract Frontend {
         controller = IController(controller_);
     }
 
-    function harvesters(address user)
+    function allVaults(address user)
         external
         view
         returns (
@@ -37,25 +41,28 @@ contract Frontend {
     {
         LocalVars memory v;
         v.gauge = StakelessMultiPoolBase(controller.multigauge());
-        vaults = controller.harvesterVaultsList();
         v.stgn = controller.stgn();
-        v.len = vaults.length;
-        compounders = new address[](v.len);
-        underlyings = new address[](v.len);
-        strategies = new address[](v.len);
-        strings = new string[6][](v.len);
-        tvls = new uint[](v.len);
-        decimals = new uint[](v.len);
-        balances = new uint[2][](v.len);
-        gaugeLeft = new uint[3][](v.len);
-        for (uint i; i < v.len; ++i) {
+        v.harvesters = controller.harvesterVaultsList();
+        v.compounders = controller.compounderVaultsList();
+        v.harvestersLen = v.harvesters.length;
+        v.compoundersLen = v.compounders.length;
+        v.totalLen = v.harvestersLen + v.compoundersLen;
+        vaults = new address[](v.totalLen);
+        compounders = new address[](v.totalLen);
+        underlyings = new address[](v.totalLen);
+        strategies = new address[](v.totalLen);
+        strings = new string[6][](v.totalLen);
+        tvls = new uint[](v.totalLen);
+        decimals = new uint[](v.totalLen);
+        balances = new uint[2][](v.totalLen);
+        gaugeLeft = new uint[3][](v.totalLen);
+        for (uint i; i < v.harvestersLen; ++i) {
+            vaults[i] = v.harvesters[i];
             underlyings[i] = IERC4626(vaults[i]).asset();
             strategies[i] = address(IVault(vaults[i]).strategy());
             compounders[i] = PearlStrategy(strategies[i]).compounder();
             tvls[i] = IERC4626(vaults[i]).totalAssets();
             decimals[i] = IERC20Metadata(vaults[i]).decimals();
-
-            // name and symbol
             strings[i][0] = IERC20Metadata(vaults[i]).name();
             strings[i][1] = IERC20Metadata(vaults[i]).symbol();
             strings[i][4] = IERC20Metadata(underlyings[i]).name();
@@ -64,7 +71,6 @@ contract Frontend {
             if (compounders[i] != address(0)) {
                 strings[i][2] = IERC20Metadata(compounders[i]).name();
                 strings[i][3] = IERC20Metadata(compounders[i]).symbol();
-
                 gaugeLeft[i][0] = v.gauge.left(vaults[i], compounders[i]);
                 gaugeLeft[i][1] = v.gauge.periodFinish(vaults[i], compounders[i]);
                 if (user != address(0)) {
@@ -80,7 +86,27 @@ contract Frontend {
         }
 
         if (user != address(0)) {
-            for (uint i; i < v.len; ++i) {
+            for (uint i; i < v.harvestersLen; ++i) {
+                balances[i][0] = IERC20(vaults[i]).balanceOf(user);
+                balances[i][1] = IERC20(underlyings[i]).balanceOf(user);
+            }
+        }
+
+        uint k;
+        for (uint i = v.harvestersLen; i < v.totalLen; ++i) {
+            vaults[i] = v.compounders[k];
+            underlyings[i] = IERC4626(vaults[i]).asset();
+            tvls[i] = IERC4626(vaults[i]).totalAssets();
+            decimals[i] = IERC20Metadata(vaults[i]).decimals();
+            strings[i][0] = IERC20Metadata(vaults[i]).name();
+            strings[i][1] = IERC20Metadata(vaults[i]).symbol();
+            strings[i][4] = IERC20Metadata(underlyings[i]).name();
+            strings[i][5] = IERC20Metadata(underlyings[i]).symbol();
+            ++k;
+        }
+
+        if (user != address(0)) {
+            for (uint i = v.harvestersLen; i < v.totalLen; ++i) {
                 balances[i][0] = IERC20(vaults[i]).balanceOf(user);
                 balances[i][1] = IERC20(underlyings[i]).balanceOf(user);
             }
