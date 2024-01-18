@@ -16,6 +16,7 @@ contract MockPearlGaugeV2 {
 
     ///@notice see earned rewards for user
     function earned(address account) public view returns (uint) {
+        // todo changeable
         return balanceOf[account] / 1e10;
     }
 
