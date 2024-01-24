@@ -2,14 +2,14 @@
 pragma solidity ^0.8.21;
 
 import "forge-std/Script.sol";
-import "../chains/TestnetLib.sol";
+import "../chains/GoerliLib.sol";
 import "../src/HarvesterVault.sol";
 import "../src/PearlStrategy.sol";
 import "../src/CompounderVault.sol";
 import "../test/mock/MockERC20.sol";
 import "../test/mock/MockPearlGaugeV2.sol";
 
-contract DeployTestnet is Script {
+contract DeployGoerli is Script {
     function run() external {
         uint deployerPrivateKey = vm.envUint("PRIVATE_KEY");
         vm.startBroadcast(deployerPrivateKey);
@@ -19,9 +19,9 @@ contract DeployTestnet is Script {
         address tokenA = address(new MockERC20("Mock Token A", "MOCK_A", 18));
         address tokenC = address(new MockERC20("Mock Token C", "MOCK_C", 18));
         address tokenD = address(new MockERC20("Mock Token D", "MOCK_D", 18));
-        IPearlGaugeV2 pearlGauge = IPearlGaugeV2(address(new MockPearlGaugeV2(tokenA, tokenC)));
+        IGaugeV2ALM pearlGauge = IGaugeV2ALM(address(new MockPearlGaugeV2(tokenA, tokenC)));
 
-        IController controller = IController(TestnetLib.runDeploy(tokenC, true));
+        IController controller = IController(GoerliLib.runDeploy(tokenC, true));
         Factory factory = Factory(controller.factory());
 
         // deploy IFO harvester

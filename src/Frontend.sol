@@ -6,6 +6,7 @@ import "./interfaces/IVault.sol";
 import "./PearlStrategy.sol";
 import "./interfaces/IMultiPool.sol";
 import "./base/StakelessMultiPoolBase.sol";
+import "./interfaces/ILiquidBox.sol";
 
 contract Frontend {
     IController public controller;
@@ -22,6 +23,29 @@ contract Frontend {
 
     constructor(address controller_) {
         controller = IController(controller_);
+    }
+
+    function getLiquidBoxSharePrice(address alm, address priceToken) public view returns(uint price) {
+        ITetuLiquidator liquidator = ITetuLiquidator(controller.liquidator());
+        ILiquidBox lb = ILiquidBox(alm);
+        address token0 = lb.token0();
+        address token1 = lb.token1();
+        (uint total0, uint total1,) = lb.getTotalAmounts();
+        uint total0Priced;
+        uint total1Priced;
+        if (token0 != priceToken) {
+            uint decimals = IERC20Metadata(token0).decimals();
+            total0Priced = liquidator.getPrice(token0, priceToken, 10 ** decimals) * total0 / 10 ** decimals;
+        } else {
+            total0Priced = total0;
+        }
+        if (token1 != priceToken) {
+            uint decimals = IERC20Metadata(token1).decimals();
+            total1Priced = liquidator.getPrice(token1, priceToken, 10 ** decimals) * total1 / 10 ** decimals;
+        } else {
+            total1Priced = total0;
+        }
+        price = (total0Priced + total1Priced) * 1e18 / lb.totalSupply();
     }
 
     function allVaults(address user)

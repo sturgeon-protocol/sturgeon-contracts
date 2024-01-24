@@ -5,7 +5,7 @@ import {console} from "forge-std/Test.sol";
 import "../script/lib/DeployLib.sol";
 import "../test/mock/MockTetuLiquidator.sol";
 
-library TestnetLib {
+library GoerliLib {
     address public constant TOKEN_WETH = 0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9;
 
     function runDeploy(address rewardToken, bool showLog) internal returns(address) {
@@ -17,7 +17,7 @@ library TestnetLib {
         vestingClaimant[2] = 0xcc16d636dD05b52FF1D8B9CE09B09BC62b11412B; // Tetu
         vestingAmount[0] = 375_000e18;
         vestingAmount[1] = 375_000e18;
-        vestingAmount[1] = 250_000e18;
+        vestingAmount[2] = 250_000e18;
 
         MockTetuLiquidator l = new MockTetuLiquidator();
 

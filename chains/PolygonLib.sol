@@ -16,7 +16,7 @@ library PolygonLib {
         vestingClaimant[2] = 0xcc16d636dD05b52FF1D8B9CE09B09BC62b11412B; // Tetu
         vestingAmount[0] = 375_000e18;
         vestingAmount[1] = 375_000e18;
-        vestingAmount[1] = 250_000e18;
+        vestingAmount[2] = 250_000e18;
 
         Controller _c = Controller(
             DeployLib.deployPlatform(
