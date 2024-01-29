@@ -3,7 +3,7 @@ pragma solidity ^0.8.21;
 
 import "./base/StrategyStrictBase.sol";
 import "./interfaces/IVault.sol";
-import "./interfaces/IPearlGaugeV2.sol";
+import "./interfaces/IGaugeV2ALM.sol";
 import "./interfaces/IController.sol";
 import "./interfaces/IIFO.sol";
 import "./interfaces/IGauge.sol";
@@ -41,7 +41,7 @@ contract PearlStrategy is StrategyStrictBase {
         compounder = compounder_;
         IERC20(asset).approve(gauge_, type(uint).max);
         IController controller = IController(IVault(vault).controller());
-        address _gaugeRewardToken = IPearlGaugeV2(gauge_).rewardToken();
+        address _gaugeRewardToken = IGaugeV2ALM(gauge_).rewardToken();
         gaugeRewardToken = _gaugeRewardToken;
         if (ifo) {
             IERC20(_gaugeRewardToken).approve(controller.ifo(), type(uint).max);
@@ -55,7 +55,7 @@ contract PearlStrategy is StrategyStrictBase {
     }
 
     function isReadyToHardWork() external view returns (bool) {
-        return IPearlGaugeV2(gauge).earned(address(this)) > 0;
+        return IGaugeV2ALM(gauge).earnedReward(address(this)) > 0;
     }
 
     function doHardWork() external /* returns (uint earned, uint lost)*/ {
@@ -81,7 +81,7 @@ contract PearlStrategy is StrategyStrictBase {
             if (exchanged && got > 0) {
                 multigauge.notifyRewardAmount(vault, controller.stgn(), got);
             } /* else {
-                multigauge.notifyRewardAmount(vault, IPearlGaugeV2(gauge).rewardToken(), rtReward);
+                multigauge.notifyRewardAmount(vault, IGaugeV2ALM(gauge).rewardToken(), rtReward);
             }*/
         } else {
             address _compounder = compounder;
@@ -98,18 +98,18 @@ contract PearlStrategy is StrategyStrictBase {
     }
 
     function investedAssets() public view override returns (uint) {
-        return IPearlGaugeV2(gauge).balanceOf(address(this));
+        return IGaugeV2ALM(gauge).balanceOf(address(this));
     }
 
     function _claim() internal override returns (uint rtReward) {
         IERC20 rt = IERC20(gaugeRewardToken);
         uint oldBal = rt.balanceOf(address(this));
-        IPearlGaugeV2(gauge).getReward();
+        IGaugeV2ALM(gauge).collectReward();
         rtReward = rt.balanceOf(address(this)) - oldBal;
     }
 
     function _depositToPool(uint amount) internal override {
-        IPearlGaugeV2(gauge).deposit(amount);
+        IGaugeV2ALM(gauge).deposit(amount);
     }
 
     function _emergencyExitFromPool() internal override {
@@ -118,11 +118,11 @@ contract PearlStrategy is StrategyStrictBase {
     }
 
     function _withdrawFromPool(uint amount) internal override {
-        IPearlGaugeV2(gauge).withdraw(amount);
+        IGaugeV2ALM(gauge).withdraw(amount);
         IERC20(asset).safeTransfer(vault, amount);
     }
 
     function _withdrawAllFromPool() internal override {
-        _withdrawFromPool(IPearlGaugeV2(gauge).balanceOf(address(this)));
+        _withdrawFromPool(IGaugeV2ALM(gauge).balanceOf(address(this)));
     }
 }

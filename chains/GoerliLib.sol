@@ -3,12 +3,13 @@ pragma solidity ^0.8.21;
 
 import {console} from "forge-std/Test.sol";
 import "../script/lib/DeployLib.sol";
+import "../test/mock/MockTetuLiquidator.sol";
 
-library PolygonLib {
-    address public constant TOKEN_PEARL = 0x7238390d5f6F64e67c3211C343A410E2A3DEc142;
+library GoerliLib {
+    address public constant TOKEN_WETH = 0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9;
 
-    function runDeploy(bool showLog) internal {
-        address governance = 0x520Ab98a23100369E5280d214799b1E1c0123045;
+    function runDeploy(address rewardToken, bool showLog) internal returns(address) {
+        address governance = 0x3d0c177E035C30bb8681e5859EB98d114b48b935; // test deployer
         address[] memory vestingClaimant = new address[](3);
         uint[] memory vestingAmount = new uint[](3);
         vestingClaimant[0] = 0x520Ab98a23100369E5280d214799b1E1c0123045; // Claw
@@ -17,6 +18,8 @@ library PolygonLib {
         vestingAmount[0] = 375_000e18;
         vestingAmount[1] = 375_000e18;
         vestingAmount[2] = 250_000e18;
+
+        MockTetuLiquidator l = new MockTetuLiquidator();
 
         Controller _c = Controller(
             DeployLib.deployPlatform(
@@ -27,8 +30,8 @@ library PolygonLib {
                     vestingAmount: vestingAmount,
                     vestingPeriod: 365 days,
                     vestingCliff: 180 days,
-                    rewardToken: TOKEN_PEARL,
-                    liquidator: address(0)
+                    rewardToken: rewardToken,
+                    liquidator: address(l)
                 })
             )
         );
@@ -36,6 +39,8 @@ library PolygonLib {
         if (showLog) {
             console.log("Deployed. Controller:", address(_c));
         }
+
+        return address(_c);
     }
 
     function testA() public {}

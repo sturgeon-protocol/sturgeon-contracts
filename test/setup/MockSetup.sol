@@ -12,7 +12,7 @@ import "../../src/VeDistributor.sol";
 import "../../src/Vesting.sol";
 import "../../script/lib/DeployLib.sol";
 import "../mock/MockERC20.sol";
-import "../../src/interfaces/IPearlGaugeV2.sol";
+import "../../src/interfaces/IGaugeV2ALM.sol";
 import "../mock/MockPearlGaugeV2.sol";
 import "../mock/MockTetuLiquidator.sol";
 
@@ -32,7 +32,7 @@ abstract contract MockSetup is Test {
     // CVR (underlying of the first compounder vault)
     address public tokenD;
 
-    IPearlGaugeV2 public pearlGauge;
+    IGaugeV2ALM public pearlGauge;
 
     constructor() {
         tokenA = address(new MockERC20("Mock Token A", "MOCK_A", 18));
@@ -41,6 +41,8 @@ abstract contract MockSetup is Test {
         tokenD = address(new MockERC20("Mock Token D", "MOCK_D", 18));
         controller = _init();
         factory = Factory(controller.factory());
+        MockTetuLiquidator l = MockTetuLiquidator(controller.liquidator());
+        l.setPrice(tokenC, tokenD, 2e18);
     }
 
     function _init() public returns (Controller) {
@@ -67,7 +69,7 @@ abstract contract MockSetup is Test {
         );
 
         // mock gauge
-        pearlGauge = IPearlGaugeV2(address(new MockPearlGaugeV2(tokenA, tokenC)));
+        pearlGauge = IGaugeV2ALM(address(new MockPearlGaugeV2(tokenA, tokenC)));
 
         return _c;
     }

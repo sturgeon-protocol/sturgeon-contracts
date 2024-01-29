@@ -37,6 +37,7 @@ contract Factory is Controllable {
         string calldata vaultSymbol
     ) external onlyGovernance returns (address compounder) {
         compounder = address(new CompounderVault(IERC20(underlying), vaultName, vaultSymbol));
+        IController(controller()).registerVault(compounder, false);
     }
 
     function deployHarvester(
@@ -53,6 +54,7 @@ contract Factory is Controllable {
         address multigauge = IController(_controller).multigauge();
         IGauge(multigauge).addStakingToken(vault);
         IMultiPool(multigauge).registerRewardToken(vault, compounderVault);
+        IController(_controller).registerVault(vault, true);
     }
 
     function _requireGovernance() internal view {
