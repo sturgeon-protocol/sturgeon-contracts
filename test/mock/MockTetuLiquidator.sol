@@ -30,8 +30,8 @@ contract MockTetuLiquidator is ITetuLiquidator {
     ) external view returns (PoolData[] memory route, string memory errorMessage) {}
 
     function liquidate(address tokenIn, address tokenOut, uint amount, uint /*priceImpactTolerance*/ ) external {
-//        console.log('liquidate tokenIn', IERC20Metadata(tokenIn).symbol());
-//        console.log('liquidate tokenOut', IERC20Metadata(tokenOut).symbol());
+        //        console.log('liquidate tokenIn', IERC20Metadata(tokenIn).symbol());
+        //        console.log('liquidate tokenOut', IERC20Metadata(tokenOut).symbol());
         if (amount == 0) {
             amount = 10 ** IERC20Metadata(tokenIn).decimals();
         }

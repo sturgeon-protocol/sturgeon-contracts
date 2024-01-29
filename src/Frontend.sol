@@ -25,7 +25,7 @@ contract Frontend {
         controller = IController(controller_);
     }
 
-    function getLiquidBoxSharePrice(address alm, address priceToken) public view returns(uint price) {
+    function getLiquidBoxSharePrice(address alm, address priceToken) public view returns (uint price) {
         ITetuLiquidator liquidator = ITetuLiquidator(controller.liquidator());
         ILiquidBox lb = ILiquidBox(alm);
         address token0 = lb.token0();
@@ -51,7 +51,10 @@ contract Frontend {
         }
     }
 
-    function allVaults(address user, address priceToken)
+    function allVaults(
+        address user,
+        address priceToken
+    )
         external
         view
         returns (

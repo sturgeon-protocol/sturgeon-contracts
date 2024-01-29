@@ -374,7 +374,8 @@ library VeSTGNLib {
         uint untilEnd,
         uint _value
     ) public pure returns (string memory output) {
-        output = '<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 2406.2 3609.2" style="enable-background:new 0 0 2406.2 3609.2;" xml:space="preserve"><style>.st0 {fill:#101035;}.st1 {fill:#5E78F7;}.st2 {font-family:"TimesNewRomanPS-BoldMT";}.st3 {font-size:189px;}.st4 {fill:#FFFFFF;}.st5 {font-family:"TimesNewRomanPSMT";}.st6 {font-size:164.1369px;}.st7 {fill:#212E6D;}.st8 {fill:#3D68D3;}</style><rect class="st0" width="2406.2" height="3609.2"/>';
+        output =
+            '<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 2406.2 3609.2" style="enable-background:new 0 0 2406.2 3609.2;" xml:space="preserve"><style>.st0 {fill:#101035;}.st1 {fill:#5E78F7;}.st2 {font-family:"TimesNewRomanPS-BoldMT";}.st3 {font-size:189px;}.st4 {fill:#FFFFFF;}.st5 {font-family:"TimesNewRomanPSMT";}.st6 {font-size:164.1369px;}.st7 {fill:#212E6D;}.st8 {fill:#3D68D3;}</style><rect class="st0" width="2406.2" height="3609.2"/>';
 
         output = string(
             abi.encodePacked(

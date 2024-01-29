@@ -8,12 +8,12 @@ import "./interfaces/IVe.sol";
 contract DepositHelper is ReentrancyGuard {
     using SafeERC20 for IERC20;
 
-    function createLock(IVe ve, address token, uint value, uint lockDuration) external nonReentrant returns (
-        uint tokenId,
-        uint lockedAmount,
-        uint power,
-        uint unlockDate
-    ) {
+    function createLock(
+        IVe ve,
+        address token,
+        uint value,
+        uint lockDuration
+    ) external nonReentrant returns (uint tokenId, uint lockedAmount, uint power, uint unlockDate) {
         IERC20(token).safeTransferFrom(msg.sender, address(this), value);
         _approveIfNeeds(token, value, address(ve));
         tokenId = ve.createLockFor(token, value, lockDuration, msg.sender);
@@ -25,11 +25,12 @@ contract DepositHelper is ReentrancyGuard {
         _sendRemainingToken(token);
     }
 
-    function increaseAmount(IVe ve, address token, uint tokenId, uint value) external nonReentrant returns (
-        uint lockedAmount,
-        uint power,
-        uint unlockDate
-    ) {
+    function increaseAmount(
+        IVe ve,
+        address token,
+        uint tokenId,
+        uint value
+    ) external nonReentrant returns (uint lockedAmount, uint power, uint unlockDate) {
         IERC20(token).safeTransferFrom(msg.sender, address(this), value);
         _approveIfNeeds(token, value, address(ve));
         ve.increaseAmount(token, tokenId, value);

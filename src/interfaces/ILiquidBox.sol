@@ -3,26 +3,26 @@ pragma solidity ^0.8.21;
 
 interface ILiquidBox {
     /**
-    * @notice Deposits tokens into the vault, distributing them
-    * in proportion to the current holdings.
-    * @dev Tokens deposited remain in the vault until the next
-    * rebalance and are not utilized for liquidity on Pearl.
-    * @param amount0Desired Maximum amount of token0 to deposit
-    * @param amount1Desired Maximum amount of token1 to deposit
-    * @param to Recipient of shares
-    * @param amount0Min Reverts if the resulting amount0 is less than this
-    * @param amount1Min Reverts if the resulting amount1 is less than this
-    * @return shares Number of shares minted
-    * @return amount0 Amount of token0 deposited
-    * @return amount1 Amount of token1 deposited
-    */
+     * @notice Deposits tokens into the vault, distributing them
+     * in proportion to the current holdings.
+     * @dev Tokens deposited remain in the vault until the next
+     * rebalance and are not utilized for liquidity on Pearl.
+     * @param amount0Desired Maximum amount of token0 to deposit
+     * @param amount1Desired Maximum amount of token1 to deposit
+     * @param to Recipient of shares
+     * @param amount0Min Reverts if the resulting amount0 is less than this
+     * @param amount1Min Reverts if the resulting amount1 is less than this
+     * @return shares Number of shares minted
+     * @return amount0 Amount of token0 deposited
+     * @return amount1 Amount of token1 deposited
+     */
     function deposit(
-        uint256 amount0Desired,
-        uint256 amount1Desired,
+        uint amount0Desired,
+        uint amount1Desired,
         address to,
-        uint256 amount0Min,
-        uint256 amount1Min
-    ) external returns (uint256 shares, uint256 amount0, uint256 amount1);
+        uint amount0Min,
+        uint amount1Min
+    ) external returns (uint shares, uint amount0, uint amount1);
 
     /**
      * @notice Withdraws tokens in proportion to the vault's holdings.
@@ -34,26 +34,23 @@ interface ILiquidBox {
      * @return amount1 Amount of token1 sent to recipient
      */
     function withdraw(
-        uint256 shares,
+        uint shares,
         address to,
-        uint256 amount0Min,
-        uint256 amount1Min
-    ) external returns (uint256 amount0, uint256 amount1);
+        uint amount0Min,
+        uint amount1Min
+    ) external returns (uint amount0, uint amount1);
 
     /**
      * @notice Calculates the vault's total holdings of token0 and token1 - in
-    * other words, how much of each token the vault would hold if it withdrew
-    * all its liquidity from Uniswap.
-    */
-    function getTotalAmounts()
-        external
-        view
-        returns (uint256 total0, uint256 total1, uint128 liquidity);
+     * other words, how much of each token the vault would hold if it withdrew
+     * all its liquidity from Uniswap.
+     */
+    function getTotalAmounts() external view returns (uint total0, uint total1, uint128 liquidity);
 
     /**
      * @dev Returns the amount of tokens in existence.
      */
-    function totalSupply() external view returns (uint256);
+    function totalSupply() external view returns (uint);
 
     function token0() external view returns (address);
 

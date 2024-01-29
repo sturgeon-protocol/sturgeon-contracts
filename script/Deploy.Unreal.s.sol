@@ -20,12 +20,20 @@ contract DeployUnreal is Script {
         Factory factory = Factory(controller.factory());
 
         // deploy IFO harvester
-        factory.deployIfoHarvester(UnrealLib.LIQUID_BOX_DAI_USDC, UnrealLib.ALM_GAUGE_DAI_USDC, "IFO Harvester DAI-USDC", "ifoTDT-DAI-USDC");
+        factory.deployIfoHarvester(
+            UnrealLib.LIQUID_BOX_DAI_USDC, UnrealLib.ALM_GAUGE_DAI_USDC, "IFO Harvester DAI-USDC", "ifoTDT-DAI-USDC"
+        );
 
         // deploy compounder + harvester
         CompounderVault compounderVault =
             CompounderVault(factory.deployCompounder(UnrealLib.TOKEN_CVR, "Compounder CVR", "cCVR"));
-        factory.deployHarvester(UnrealLib.LIQUID_BOX_DAI_USDC, UnrealLib.ALM_GAUGE_DAI_USDC, "Harvester DAI-USDC", "xTDT-DAI-USDC", address(compounderVault));
+        factory.deployHarvester(
+            UnrealLib.LIQUID_BOX_DAI_USDC,
+            UnrealLib.ALM_GAUGE_DAI_USDC,
+            "Harvester DAI-USDC",
+            "xTDT-DAI-USDC",
+            address(compounderVault)
+        );
 
         vm.stopBroadcast();
     }
