@@ -35,10 +35,11 @@ cast call --rpc-url https://rpc.unreal.gelato.digital 0x35bf701C24357FD0C7F60376
 * STGN 0x609e0d74fAB81085283df92B563750624054F8bE [Blockscout](https://unreal.blockscout.com/address/0x609e0d74fAB81085283df92B563750624054F8bE?tab=contract)
 * veSTGN proxy 0x029Dfd1a79e0AD9305d773fb8F3c01D8eF9b913d [Blockscout](https://unreal.blockscout.com/address/0x029Dfd1a79e0AD9305d773fb8F3c01D8eF9b913d?tab=contract)
 * Multigauge proxy 0x5B0Ad247bc0Fac75d76D1337932fc29b1eCb8eE6 [Blockscout](https://unreal.blockscout.com/address/0x5B0Ad247bc0Fac75d76D1337932fc29b1eCb8eE6?tab=contract)
-* Factory 0x87eDeA5aea52BA12Ebf4eBc253Ec3218C1090C70 [Blockscout](https://unreal.blockscout.com/address/0x87eDeA5aea52BA12Ebf4eBc253Ec3218C1090C70?tab=contract)
+* Factory proxy 0x045c8A060474874c5918717eCd55F07B62C59a90 [Blockscout](https://unreal.blockscout.com/address/0x045c8A060474874c5918717eCd55F07B62C59a90?tab=contract)
 * VeDistributor proxy 0xAf95468B1a624605bbFb862B0FB6e9C73Ad847b8 [Blockscout](https://unreal.blockscout.com/address/0xAf95468B1a624605bbFb862B0FB6e9C73Ad847b8?tab=contract)
-* Frontend 0x35bf701C24357FD0C7F60376044323A2a830ad78 [Blockscout](https://unreal.blockscout.com/address/0x35bf701C24357FD0C7F60376044323A2a830ad78?tab=contract)
+* Frontend 0xA38588970eD3c17C6De6A77D4E06C914B58A4F30 [Blockscout](https://unreal.blockscout.com/address/0xA38588970eD3c17C6De6A77D4E06C914B58A4F30?tab=contract)
 * DepositHelper 0x7c8d0C7B63249A314df84707F8690F62CF625820 [Blockscout](https://unreal.blockscout.com/address/0x7c8d0C7B63249A314df84707F8690F62CF625820?tab=contract)
+* Compounder proxy 0x89c06219C24ab4aBd762A49cdE97ce69B05f3EAF [Blockscout](https://unreal.blockscout.com/address/0x89c06219C24ab4aBd762A49cdE97ce69B05f3EAF?tab=contract)
 
 ### Goerli testnet
 

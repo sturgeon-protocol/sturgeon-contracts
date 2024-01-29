@@ -23,8 +23,9 @@ contract PearlStrategyTest is MockSetup {
         vault.redeem(1e18, address(this), address(this));
         assertEq(vault.balanceOf(address(this)), 0);
 
-        vault.deposit(1e18, address(this));
-        assertEq(vault.balanceOf(address(this)), 1e18);
+        uint depositAmount = 212000;
+        vault.deposit(depositAmount, address(this));
+        assertEq(vault.balanceOf(address(this)), depositAmount);
 
         skip(3600);
 
@@ -59,8 +60,10 @@ contract PearlStrategyTest is MockSetup {
         assertEq(IMultiPool(controller.multigauge()).balanceOf(address(vault), address(this)), 1e18);
         vault.redeem(1e18, address(this), address(this));
         assertEq(vault.balanceOf(address(this)), 0);
-        vault.deposit(1e18, address(this));
-        assertEq(vault.balanceOf(address(this)), 1e18);
+
+        uint depositAmount = 212000;
+        vault.deposit(depositAmount, address(this));
+        assertEq(vault.balanceOf(address(this)), depositAmount);
         skip(3600);
         strategy.doHardWork();
         deal(tokenC, address(pearlGauge), 1e18);

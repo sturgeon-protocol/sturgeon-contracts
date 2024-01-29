@@ -24,7 +24,7 @@ contract DeployUnreal is Script {
 
         // deploy compounder + harvester
         CompounderVault compounderVault =
-            CompounderVault(factory.deployCompounder(UnrealLib.TOKEN_CVR, "Compounder vault CVR", "cCVR"));
+            CompounderVault(factory.deployCompounder(UnrealLib.TOKEN_CVR, "Compounder CVR", "cCVR"));
         factory.deployHarvester(UnrealLib.LIQUID_BOX_DAI_USDC, UnrealLib.ALM_GAUGE_DAI_USDC, "Harvester DAI-USDC", "xTDT-DAI-USDC", address(compounderVault));
 
         vm.stopBroadcast();

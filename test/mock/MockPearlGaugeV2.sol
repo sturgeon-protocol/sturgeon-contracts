@@ -17,7 +17,7 @@ contract MockPearlGaugeV2 is IGaugeV2ALM {
     ///@notice see earned rewards for user
     function earnedReward(address account) public view returns (uint) {
         // todo changeable
-        return balanceOf[account] / 1e10;
+        return balanceOf[account] / 10;
     }
 
     ///@notice deposit amount TOKEN

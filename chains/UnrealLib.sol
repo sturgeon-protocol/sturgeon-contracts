@@ -17,9 +17,10 @@ library UnrealLib {
     address public constant POOL_DAI_PEARL_3000 = 0xeC491B6bC5554f76348FB40eEfbf0Ed60cd22Bd2;
     address public constant POOL_PEARL_USDC_3000 = 0x76994b9683e17B0A9Ed344fCD432A8E3BF7E22C1;
     // Trident TDT-DAI-USDC
-    address public constant LIQUID_BOX_DAI_USDC = 0x67048eA97Ca5DFDAe111A2304af1aED5115C7946;
+    address public constant LIQUID_BOX_DAI_USDC = 0x8B9184243B8a787eaff8C304b17ED23fFD6F8c23;
+
     // IGaugeV2ALM
-    address public constant ALM_GAUGE_DAI_USDC = 0xc193199C2BE0dB1ce53967257cC7A2009844D01f;
+    address public constant ALM_GAUGE_DAI_USDC = 0x659f401aE8194e00673fe58367Ed77137542faA3;
 
     // Sturgeon infrastructure
     address public constant LIQUIDATOR = 0xE0D142466d1BF88FE23D5D265d76068077E4D6F0;

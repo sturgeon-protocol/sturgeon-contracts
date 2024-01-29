@@ -45,10 +45,13 @@ contract Frontend {
         } else {
             total1Priced = total0;
         }
-        price = (total0Priced + total1Priced) * 1e18 / lb.totalSupply();
+        uint totalSupply = lb.totalSupply();
+        if (totalSupply > 0) {
+            price = (total0Priced + total1Priced) * 1e18 / totalSupply;
+        }
     }
 
-    function allVaults(address user)
+    function allVaults(address user, address priceToken)
         external
         view
         returns (
@@ -57,8 +60,7 @@ contract Frontend {
             address[] memory underlyings,
             string[6][] memory strings, // vault name, vault symbol, compounder name, compounder symbol, underlying name, underlying symbol
             address[] memory strategies,
-            uint[] memory tvls,
-            uint[] memory decimals,
+            uint[3][] memory nums, // totalAssets,decimals,sharePrice
             uint[2][] memory balances, // vault user balance, underlying user balance
             uint[3][] memory gaugeLeft // left, periodFinish, earned
         )
@@ -76,8 +78,7 @@ contract Frontend {
         underlyings = new address[](v.totalLen);
         strategies = new address[](v.totalLen);
         strings = new string[6][](v.totalLen);
-        tvls = new uint[](v.totalLen);
-        decimals = new uint[](v.totalLen);
+        nums = new uint[3][](v.totalLen);
         balances = new uint[2][](v.totalLen);
         gaugeLeft = new uint[3][](v.totalLen);
         for (uint i; i < v.harvestersLen; ++i) {
@@ -85,8 +86,10 @@ contract Frontend {
             underlyings[i] = IERC4626(vaults[i]).asset();
             strategies[i] = address(IVault(vaults[i]).strategy());
             compounders[i] = PearlStrategy(strategies[i]).compounder();
-            tvls[i] = IERC4626(vaults[i]).totalAssets();
-            decimals[i] = IERC20Metadata(vaults[i]).decimals();
+            nums[i][0] = IERC4626(vaults[i]).totalAssets();
+            nums[i][1] = IERC20Metadata(vaults[i]).decimals();
+            nums[i][2] = getLiquidBoxSharePrice(underlyings[i], priceToken);
+
             strings[i][0] = IERC20Metadata(vaults[i]).name();
             strings[i][1] = IERC20Metadata(vaults[i]).symbol();
             strings[i][4] = IERC20Metadata(underlyings[i]).name();
@@ -120,8 +123,8 @@ contract Frontend {
         for (uint i = v.harvestersLen; i < v.totalLen; ++i) {
             vaults[i] = v.compounders[k];
             underlyings[i] = IERC4626(vaults[i]).asset();
-            tvls[i] = IERC4626(vaults[i]).totalAssets();
-            decimals[i] = IERC20Metadata(vaults[i]).decimals();
+            nums[i][0] = IERC4626(vaults[i]).totalAssets();
+            nums[i][1] = IERC20Metadata(vaults[i]).decimals();
             strings[i][0] = IERC20Metadata(vaults[i]).name();
             strings[i][1] = IERC20Metadata(vaults[i]).symbol();
             strings[i][4] = IERC20Metadata(underlyings[i]).name();
