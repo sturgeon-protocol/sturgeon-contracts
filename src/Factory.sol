@@ -8,6 +8,8 @@ import "./interfaces/IMultiPool.sol";
 import "./lib/DeployerLib.sol";
 
 contract Factory is Controllable {
+    string public constant VERSION = '1.0.0';
+
     function init(address controller_) external initializer {
         __Controllable_init(controller_);
     }

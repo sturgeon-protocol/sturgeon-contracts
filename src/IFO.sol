@@ -6,12 +6,12 @@ import "./interfaces/IController.sol";
 import "./interfaces/IIFO.sol";
 import "./interfaces/IStrategyStrict.sol";
 
+/// @title Initial Farm Offering
+/// @notice Contract contain all preminted STGN and allowing to change them to LP rewards until tokens exists on the balance.
+/// The exchange processed by a fixed immutable rate.
+/// Rewards goes directly to governance.
 contract IFO is IIFO {
     using SafeERC20 for IERC20;
-
-    // This contract should contain all preminted STGN and allowing to change them to LP rewards until tokens exists on the balance.
-    // The exchange will be done by a fixed rate that setup on deploy. Will be not changed later.
-    // Rewards will be sent directly to governance.
 
     address public stgn;
     address public rewardToken;
@@ -28,7 +28,7 @@ contract IFO is IIFO {
         stgn = stgn_;
         rewardToken = rewardToken_;
         controller = controller_;
-        // add event
+        emit Setup(controller_, stgn_, rewardToken_, rate);
     }
 
     function exchange(uint amount) external returns (bool, uint) {

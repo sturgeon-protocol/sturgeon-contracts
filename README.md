@@ -30,6 +30,9 @@ cast call --rpc-url https://rpc.unreal.gelato.digital 0x35bf701C24357FD0C7F60376
 
 ### Unreal testnet
 
+
+#### Deployed contracts
+
 * Controller 0x4F69329E8dE13aA7EAc664368C5858AF6371FA4c [Blockscout](https://unreal.blockscout.com/address/0x4F69329E8dE13aA7EAc664368C5858AF6371FA4c?tab=contract)
 * IFO 0x3222eb4824cEb0E9CcfE11018C83429105dFE00F [Blockscout](https://unreal.blockscout.com/address/0x3222eb4824cEb0E9CcfE11018C83429105dFE00F?tab=contract)
 * STGN 0x609e0d74fAB81085283df92B563750624054F8bE [Blockscout](https://unreal.blockscout.com/address/0x609e0d74fAB81085283df92B563750624054F8bE?tab=contract)
@@ -40,6 +43,16 @@ cast call --rpc-url https://rpc.unreal.gelato.digital 0x35bf701C24357FD0C7F60376
 * Frontend 0xA38588970eD3c17C6De6A77D4E06C914B58A4F30 [Blockscout](https://unreal.blockscout.com/address/0xA38588970eD3c17C6De6A77D4E06C914B58A4F30?tab=contract)
 * DepositHelper 0x7c8d0C7B63249A314df84707F8690F62CF625820 [Blockscout](https://unreal.blockscout.com/address/0x7c8d0C7B63249A314df84707F8690F62CF625820?tab=contract)
 * Compounder proxy 0x89c06219C24ab4aBd762A49cdE97ce69B05f3EAF [Blockscout](https://unreal.blockscout.com/address/0x89c06219C24ab4aBd762A49cdE97ce69B05f3EAF?tab=contract)
+
+#### Addresses
+
+* PEARL 0xCE1581d7b4bA40176f0e219b2CaC30088Ad50C7A
+* CVR 0xC0Fd0e8d5c3Bdc2C06b2Ee9FfE81ceCbE1B59364
+* pool PEARL-CVR 0x725565FF3d821D655A475819031e168ffb63901C
+* LiquidBoxManager 0xCc2b204Fb8BdE255B5820049108c53137F7DdeD4
+* DAI-USDC LiquidBox ALM 0xAB5a4189e947E0e3EbEc25637f73deb55f6CEEA9
+* DAI-USDC GaugeV2ALM 0x54cbd289b263cd14e6707ecbda01161c4385dfe3
+
 
 ### Goerli testnet
 

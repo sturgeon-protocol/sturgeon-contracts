@@ -22,7 +22,7 @@ import "./interfaces/IVeDistributor.sol";
 /* Compounding should be called no more frequently than 1 per 12h                       */
 /*´:°•.°+.*•´.*:˚.°*.˚•´.°:°•.°•.*•´.°:°•.°+.*•´.*:*.°:°•.°•.*•´.*:˚.°*.˚•´.°:°•.°+.*•´.*/
 
-contract PearlStrategy is StrategyStrictBase {
+contract PearlStrategyCustomIFO is StrategyStrictBase {
     using SafeERC20 for IERC20;
 
     uint internal constant LIQUIDATOR_PRICE_IMPACT_TOLERANCE = 20_000;
@@ -33,20 +33,23 @@ contract PearlStrategy is StrategyStrictBase {
 
     address public gaugeRewardToken;
 
+    address public ifoAddress;
+
     bool public ifo;
 
     address public compounder;
 
-    constructor(address vault_, address gauge_, bool ifo_, address compounder_) StrategyStrictBase(vault_) {
+    constructor(address ifoAddress_, address vault_, address gauge_, bool ifo_, address compounder_) StrategyStrictBase(vault_) {
         gauge = gauge_;
         ifo = ifo_;
+        ifoAddress = ifoAddress_;
         compounder = compounder_;
         IERC20(asset).approve(gauge_, type(uint).max);
         IController controller = IController(IVault(vault).controller());
         address _gaugeRewardToken = IGaugeV2ALM(gauge_).rewardToken();
         gaugeRewardToken = _gaugeRewardToken;
         if (ifo) {
-            IERC20(_gaugeRewardToken).approve(controller.ifo(), type(uint).max);
+            IERC20(_gaugeRewardToken).approve(ifoAddress_, type(uint).max);
             IERC20(controller.stgn()).approve(controller.multigauge(), type(uint).max);
         } else {
             IERC20(_gaugeRewardToken).approve(controller.liquidator(), type(uint).max);
@@ -78,7 +81,7 @@ contract PearlStrategy is StrategyStrictBase {
 
         IGauge multigauge = IGauge(controller.multigauge());
         if (ifo) {
-            IIFO _ifo = IIFO(controller.ifo());
+            IIFO _ifo = IIFO(ifoAddress);
             (bool exchanged, uint got) = _ifo.exchange(rtReward);
             if (exchanged && got > 0) {
                 multigauge.notifyRewardAmount(vault, controller.stgn(), got);
