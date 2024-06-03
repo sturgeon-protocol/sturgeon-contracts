@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BUSL-1.1
-pragma solidity ^0.8.21;
+pragma solidity ^0.8.26;
 
 abstract contract UpgradeableProxy {
     /// @dev This is the keccak-256 hash of "eip1967.proxy.implementation" subtracted by 1, and is

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BUSL-1.1
-pragma solidity ^0.8.21;
+pragma solidity ^0.8.26;
 
 library StringLib {
     function toAsciiString(address x) internal pure returns (string memory) {

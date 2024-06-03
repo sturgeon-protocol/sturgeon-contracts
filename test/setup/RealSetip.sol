@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BUSL-1.1
-pragma solidity ^0.8.21;
+pragma solidity ^0.8.26;
 
 import {Test, console} from "forge-std/Test.sol";
 import "../../src/Controller.sol";
@@ -20,7 +20,7 @@ abstract contract RealSetup is Test {
     IGaugeV2ALM public pearlGauge = IGaugeV2ALM(GAUGE_ALM);
 
     constructor() {
-        vm.selectFork(vm.createFork(vm.envString("REAL_RPC_URL")));
+        vm.selectFork(vm.createFork("https://real.drpc.org"));
         vm.rollFork(82383);
 
         controller = Controller(RealLib.runDeploy(false));
