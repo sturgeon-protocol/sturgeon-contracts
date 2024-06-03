@@ -7,7 +7,6 @@ import "../src/HarvesterVault.sol";
 import "../src/PearlStrategy.sol";
 import "../src/interfaces/IMultiPool.sol";
 
-
 contract DeployVaultAndStrategy is Script {
     address public constant CONTROLLER = 0x4F69329E8dE13aA7EAc664368C5858AF6371FA4c;
 
@@ -20,13 +19,7 @@ contract DeployVaultAndStrategy is Script {
         vm.startBroadcast(deployerPrivateKey);
 
         address vault = address(
-            new HarvesterVault(
-                CONTROLLER,
-                IERC20(underlying),
-                "Harvester DAI-USDC (New)",
-                "xTDT-DAI-USDC",
-                4_000
-            )
+            new HarvesterVault(CONTROLLER, IERC20(underlying), "Harvester DAI-USDC (New)", "xTDT-DAI-USDC", 4_000)
         );
         address strategy = address(new PearlStrategy(vault, pearlGauge, false, compounderVault));
         IVault(vault).setStrategy(strategy);

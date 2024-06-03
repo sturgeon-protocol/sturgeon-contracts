@@ -10,7 +10,6 @@ import "./setup/RealSetip.sol";
 import {ILiquidatorController} from "../src/interfaces/ILiquidatorController.sol";
 
 contract PearlStrategyRealTest is RealSetup {
-
     function test_ifo_real() public {
         HarvesterVault vault =
             new HarvesterVault(address(controller), IERC20(tokenA), "IFO Harvester MOCK_A", "xTokenA", 4_000);

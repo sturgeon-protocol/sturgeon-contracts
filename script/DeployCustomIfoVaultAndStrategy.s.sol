@@ -8,7 +8,6 @@ import "../src/interfaces/IMultiPool.sol";
 import "../src/IFO.sol";
 import "../src/PearlStrategyCustomIFO.sol";
 
-
 contract DeployCustomIfoVaultAndStrategy is Script {
     address public constant CONTROLLER = 0x4F69329E8dE13aA7EAc664368C5858AF6371FA4c;
     address public constant STGN = 0x609e0d74fAB81085283df92B563750624054F8bE;
@@ -26,11 +25,7 @@ contract DeployCustomIfoVaultAndStrategy is Script {
 
         address vault = address(
             new HarvesterVault(
-                CONTROLLER,
-                IERC20(underlying),
-                "IFO Harvester DAI-USDC custom",
-                "ifocTDT-DAI-USDC",
-                4_000
+                CONTROLLER, IERC20(underlying), "IFO Harvester DAI-USDC custom", "ifocTDT-DAI-USDC", 4_000
             )
         );
         address strategy = address(new PearlStrategyCustomIFO(address(ifo), vault, pearlGauge, true, address(0)));

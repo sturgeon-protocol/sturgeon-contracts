@@ -39,7 +39,13 @@ contract PearlStrategyCustomIFO is StrategyStrictBase {
 
     address public compounder;
 
-    constructor(address ifoAddress_, address vault_, address gauge_, bool ifo_, address compounder_) StrategyStrictBase(vault_) {
+    constructor(
+        address ifoAddress_,
+        address vault_,
+        address gauge_,
+        bool ifo_,
+        address compounder_
+    ) StrategyStrictBase(vault_) {
         gauge = gauge_;
         ifo = ifo_;
         ifoAddress = ifoAddress_;

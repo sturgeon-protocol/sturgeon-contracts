@@ -50,7 +50,7 @@ contract Vesting is IVesting {
     }
 
     /// @inheritdoc IVesting
-    function claim() external returns(uint amount) {
+    function claim() external returns (uint amount) {
         address _claimant = claimant;
         require(_claimant == msg.sender, "Not claimant");
         require(startTs != 0, "Not started");
