@@ -17,10 +17,12 @@ import "./interfaces/IVeDistributor.sol";
 /* Compounding - creating more underlying                                               */
 /* Sending profit to different destinations                                             */
 /* Have rewards/compounding logic, depending on setup case                              */
+/* Strategy should send gas compensation on every compounding                           */
+/* Compensation will be taken from user part of profit but no more than 10%             */
 /* Compounding should be called no more frequently than 1 per 12h                       */
 /*´:°•.°+.*•´.*:˚.°*.˚•´.°:°•.°•.*•´.°:°•.°+.*•´.*:*.°:°•.°•.*•´.*:˚.°*.˚•´.°:°•.°+.*•´.*/
 
-contract PearlStrategy is StrategyStrictBase {
+contract PearlStrategyCustomIFO is StrategyStrictBase {
     using SafeERC20 for IERC20;
 
     uint internal constant LIQUIDATOR_PRICE_IMPACT_TOLERANCE = 20_000;
@@ -31,24 +33,29 @@ contract PearlStrategy is StrategyStrictBase {
 
     address public gaugeRewardToken;
 
+    address public ifoAddress;
+
     bool public ifo;
 
     address public compounder;
 
-    uint public minHardWorkDelay = 12 hours;
-
-    error WaitTill(uint timestamp);
-
-    constructor(address vault_, address gauge_, bool ifo_, address compounder_) StrategyStrictBase(vault_) {
+    constructor(
+        address ifoAddress_,
+        address vault_,
+        address gauge_,
+        bool ifo_,
+        address compounder_
+    ) StrategyStrictBase(vault_) {
         gauge = gauge_;
         ifo = ifo_;
+        ifoAddress = ifoAddress_;
         compounder = compounder_;
         IERC20(asset).approve(gauge_, type(uint).max);
         IController controller = IController(IVault(vault).controller());
         address _gaugeRewardToken = IGaugeV2ALM(gauge_).rewardToken();
         gaugeRewardToken = _gaugeRewardToken;
         if (ifo) {
-            IERC20(_gaugeRewardToken).approve(controller.ifo(), type(uint).max);
+            IERC20(_gaugeRewardToken).approve(ifoAddress_, type(uint).max);
             IERC20(controller.stgn()).approve(controller.multigauge(), type(uint).max);
         } else {
             IERC20(_gaugeRewardToken).approve(controller.liquidator(), type(uint).max);
@@ -56,24 +63,15 @@ contract PearlStrategy is StrategyStrictBase {
             IERC20(compounderAsset).approve(compounder_, type(uint).max);
             IERC20(compounder_).approve(controller.multigauge(), type(uint).max);
         }
-        lastHardWork = block.timestamp;
     }
 
-    function setMinHardWorkDelay(uint delay) external {
-        if (msg.sender != IController(IVault(vault).controller()).governance()) {
-            revert("Denied");
-        }
-        minHardWorkDelay = delay;
+    function isReadyToHardWork() external view returns (bool) {
+        return IGaugeV2ALM(gauge).earnedReward(address(this)) > 0;
     }
 
-    function doHardWork() external {
+    function doHardWork() external /* returns (uint earned, uint lost)*/ {
         // claim fees if available
         // liquidate fee if available
-
-        uint timelock = lastHardWork + minHardWorkDelay;
-        if (block.timestamp < timelock) {
-            revert WaitTill(timelock);
-        }
 
         uint rtReward = _claim();
         uint perfFee = rtReward / 10;
@@ -89,7 +87,7 @@ contract PearlStrategy is StrategyStrictBase {
 
         IGauge multigauge = IGauge(controller.multigauge());
         if (ifo) {
-            IIFO _ifo = IIFO(controller.ifo());
+            IIFO _ifo = IIFO(ifoAddress);
             (bool exchanged, uint got) = _ifo.exchange(rtReward);
             if (exchanged && got > 0) {
                 multigauge.notifyRewardAmount(vault, controller.stgn(), got);
@@ -106,12 +104,6 @@ contract PearlStrategy is StrategyStrictBase {
                 multigauge.notifyRewardAmount(vault, _compounder, shares);
             }
         }
-
-        lastHardWork = block.timestamp;
-    }
-
-    function isReadyToHardWork() external view returns (bool) {
-        return block.timestamp > lastHardWork + minHardWorkDelay && IGaugeV2ALM(gauge).earnedReward(address(this)) > 0;
     }
 
     function investedAssets() public view override returns (uint) {

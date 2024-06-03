@@ -1,6 +1,34 @@
 # Sturgeon contracts
 
-## Usage
+## Deployments
+
+### Real
+
+* Controller [0xE0E71B484Bb20E37d18Ab51fB60c32deC778478A](https://explorer.re.al/address/0xE0E71B484Bb20E37d18Ab51fB60c32deC778478A)
+* IFO [0x4c5758e3c454a260d98238706ca6f4802cc52746](https://explorer.re.al/address/0x4c5758e3c454a260d98238706ca6f4802cc52746?tab=contract)
+* STGN [0x22d031e45a02d6472786b9d7a4fd78f1733d6990](https://explorer.re.al/address/0x22d031e45a02d6472786b9d7a4fd78f1733d6990?tab=contract)
+* veSTGN proxy [0x4f69329e8de13aa7eac664368c5858af6371fa4c](https://explorer.re.al/address/0x4f69329e8de13aa7eac664368c5858af6371fa4c?tab=contract)
+* Multigauge proxy [0xbca14cf8cc2417a5b4ed242ba45ae4835af4d5df](https://explorer.re.al/address/0xbca14cf8cc2417a5b4ed242ba45ae4835af4d5df?tab=contract)
+* Factory proxy [0x97b56feada7fb2d7a0a8576635f05314f184f0c2](https://explorer.re.al/address/0x97b56feada7fb2d7a0a8576635f05314f184f0c2?tab=contract)
+* VeDistributor proxy [0x7dc43c0165bfc9d202fa24bef10992f599014999](https://explorer.re.al/address/0x7dc43c0165bfc9d202fa24bef10992f599014999?tab=contract)
+* Frontend [0x045c8a060474874c5918717ecd55f07b62c59a90](https://explorer.re.al/address/0x045c8a060474874c5918717ecd55f07b62c59a90?tab=contract)
+* DepositHelper [0xAf95468B1a624605bbFb862B0FB6e9C73Ad847b8](https://explorer.re.al/address/0xAf95468B1a624605bbFb862B0FB6e9C73Ad847b8?tab=contract)
+* Compounder proxy [0x87eDeA5aea52BA12Ebf4eBc253Ec3218C1090C70](https://explorer.re.al/address/0x87eDeA5aea52BA12Ebf4eBc253Ec3218C1090C70?tab=contract)
+
+### Unreal testnet
+
+* Controller [0x4F69329E8dE13aA7EAc664368C5858AF6371FA4c](https://unreal.blockscout.com/address/0x4F69329E8dE13aA7EAc664368C5858AF6371FA4c?tab=contract)
+* IFO [0x3222eb4824cEb0E9CcfE11018C83429105dFE00F](https://unreal.blockscout.com/address/0x3222eb4824cEb0E9CcfE11018C83429105dFE00F?tab=contract)
+* STGN [0x609e0d74fAB81085283df92B563750624054F8bE](https://unreal.blockscout.com/address/0x609e0d74fAB81085283df92B563750624054F8bE?tab=contract)
+* veSTGN proxy [0x029Dfd1a79e0AD9305d773fb8F3c01D8eF9b913d](https://unreal.blockscout.com/address/0x029Dfd1a79e0AD9305d773fb8F3c01D8eF9b913d?tab=contract)
+* Multigauge proxy [0x5B0Ad247bc0Fac75d76D1337932fc29b1eCb8eE6](https://unreal.blockscout.com/address/0x5B0Ad247bc0Fac75d76D1337932fc29b1eCb8eE6?tab=contract)
+* Factory proxy [0x045c8A060474874c5918717eCd55F07B62C59a90](https://unreal.blockscout.com/address/0x045c8A060474874c5918717eCd55F07B62C59a90?tab=contract)
+* VeDistributor proxy [0xAf95468B1a624605bbFb862B0FB6e9C73Ad847b8](https://unreal.blockscout.com/address/0xAf95468B1a624605bbFb862B0FB6e9C73Ad847b8?tab=contract)
+* Frontend [0xA38588970eD3c17C6De6A77D4E06C914B58A4F30](https://unreal.blockscout.com/address/0xA38588970eD3c17C6De6A77D4E06C914B58A4F30?tab=contract)
+* DepositHelper [0x7c8d0C7B63249A314df84707F8690F62CF625820](https://unreal.blockscout.com/address/0x7c8d0C7B63249A314df84707F8690F62CF625820?tab=contract)
+* Compounder proxy [0x89c06219C24ab4aBd762A49cdE97ce69B05f3EAF](https://unreal.blockscout.com/address/0x89c06219C24ab4aBd762A49cdE97ce69B05f3EAF?tab=contract)
+
+## Develop
 
 ### Compile, test, etc
 
@@ -10,6 +38,12 @@ forge build
 forge test -vv
 forge coverage
 forge fmt
+```
+
+### Deploy
+
+```shell
+forge script DeployReal --rpc-url https://real.drpc.org --slow --verify --verifier blockscout --verifier-url https://explorer.re.al/api?
 ```
 
 ### Add liquidator routes
@@ -25,33 +59,3 @@ cast send -i --legacy --rpc-url https://rpc.unreal.gelato.digital 0xE0D142466d1B
 ```shell
 cast call --rpc-url https://rpc.unreal.gelato.digital 0x35bf701C24357FD0C7F60376044323A2a830ad78 'getLiquidBoxSharePrice(address,address)(uint256)' 0x67048eA97Ca5DFDAe111A2304af1aED5115C7946 0xabAa4C39cf3dF55480292BBDd471E88de8Cc3C97
 ```
-
-## Deployments
-
-### Unreal testnet
-
-* Controller 0x4F69329E8dE13aA7EAc664368C5858AF6371FA4c [Blockscout](https://unreal.blockscout.com/address/0x4F69329E8dE13aA7EAc664368C5858AF6371FA4c?tab=contract)
-* IFO 0x3222eb4824cEb0E9CcfE11018C83429105dFE00F [Blockscout](https://unreal.blockscout.com/address/0x3222eb4824cEb0E9CcfE11018C83429105dFE00F?tab=contract)
-* STGN 0x609e0d74fAB81085283df92B563750624054F8bE [Blockscout](https://unreal.blockscout.com/address/0x609e0d74fAB81085283df92B563750624054F8bE?tab=contract)
-* veSTGN proxy 0x029Dfd1a79e0AD9305d773fb8F3c01D8eF9b913d [Blockscout](https://unreal.blockscout.com/address/0x029Dfd1a79e0AD9305d773fb8F3c01D8eF9b913d?tab=contract)
-* Multigauge proxy 0x5B0Ad247bc0Fac75d76D1337932fc29b1eCb8eE6 [Blockscout](https://unreal.blockscout.com/address/0x5B0Ad247bc0Fac75d76D1337932fc29b1eCb8eE6?tab=contract)
-* Factory proxy 0x045c8A060474874c5918717eCd55F07B62C59a90 [Blockscout](https://unreal.blockscout.com/address/0x045c8A060474874c5918717eCd55F07B62C59a90?tab=contract)
-* VeDistributor proxy 0xAf95468B1a624605bbFb862B0FB6e9C73Ad847b8 [Blockscout](https://unreal.blockscout.com/address/0xAf95468B1a624605bbFb862B0FB6e9C73Ad847b8?tab=contract)
-* Frontend 0xA38588970eD3c17C6De6A77D4E06C914B58A4F30 [Blockscout](https://unreal.blockscout.com/address/0xA38588970eD3c17C6De6A77D4E06C914B58A4F30?tab=contract)
-* DepositHelper 0x7c8d0C7B63249A314df84707F8690F62CF625820 [Blockscout](https://unreal.blockscout.com/address/0x7c8d0C7B63249A314df84707F8690F62CF625820?tab=contract)
-* Compounder proxy 0x89c06219C24ab4aBd762A49cdE97ce69B05f3EAF [Blockscout](https://unreal.blockscout.com/address/0x89c06219C24ab4aBd762A49cdE97ce69B05f3EAF?tab=contract)
-
-### Goerli testnet
-
-* Controller 0x8216C9afFC982428aF33D1D9F165bAf9D75AebBa
-* IFO 0x029Dfd1a79e0AD9305d773fb8F3c01D8eF9b913d
-* STGN 0x5B0Ad247bc0Fac75d76D1337932fc29b1eCb8eE6
-* veSTGN proxy 0x87eDeA5aea52BA12Ebf4eBc253Ec3218C1090C70
-* Multigauge 0xAf95468B1a624605bbFb862B0FB6e9C73Ad847b8
-* Factory 0xBD5296DC2603942F116B375c8Ee373674be86f56
-* VeDistributor proxy 0x7c8d0C7B63249A314df84707F8690F62CF625820
-* MockGauge 0x54F22378E03BeA25a05A071b60357d31Ce535Bb9
-* MockLiquidator 0x97B56FEAdA7fb2D7A0A8576635f05314f184f0C2
-* MockA 0xBcA14CF8Cc2417a5B4ed242bA45aE4835aF4d5Df
-* MockC 0x609e0d74fAB81085283df92B563750624054F8bE
-* MockD 0x635B1F7dD7d0172533BA9fE5Cfe2D83D9848f701

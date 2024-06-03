@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BUSL-1.1
-pragma solidity ^0.8.21;
+pragma solidity ^0.8.26;
 
 import "./setup/MockSetup.sol";
 
@@ -14,7 +14,7 @@ contract PerfFeeTreasuryTest is MockSetup {
         IERC20(tokenA).approve(address(vault), 1e20);
         vault.mint(1e18, address(this));
         deal(tokenC, address(pearlGauge), 1e18);
-        skip(3600);
+        skip(12 hours);
         strategy.doHardWork();
         assertEq(_getRewardFromIfoGauge(address(vault), controller.stgn()), 0);
 

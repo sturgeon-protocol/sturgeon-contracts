@@ -1,13 +1,17 @@
 // SPDX-License-Identifier: BUSL-1.1
-pragma solidity ^0.8.21;
+pragma solidity ^0.8.26;
 
-interface ITetuLiquidator {
+import {ILiquidatorControllable} from "./ILiquidatorControllable.sol";
+
+interface ITetuLiquidator is ILiquidatorControllable {
     struct PoolData {
         address pool;
         address swapper;
         address tokenIn;
         address tokenOut;
     }
+
+    function addLargestPools(PoolData[] memory _pools, bool rewrite) external;
 
     function getPrice(address tokenIn, address tokenOut, uint amount) external view returns (uint);
 

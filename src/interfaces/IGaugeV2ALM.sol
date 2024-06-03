@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BUSL-1.1
-pragma solidity ^0.8.21;
+pragma solidity ^0.8.26;
 
 interface IGaugeV2ALM {
     function box() external view returns (address);
