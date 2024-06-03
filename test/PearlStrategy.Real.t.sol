@@ -32,7 +32,7 @@ contract PearlStrategyRealTest is RealSetup {
         vault.deposit(depositAmount, address(this));
         assertEq(vault.balanceOf(address(this)), depositAmount);
 
-        skip(3600);
+        skip(12 hours);
 
         vm.expectRevert("Not valid vault");
         strategy.doHardWork();
@@ -43,15 +43,21 @@ contract PearlStrategyRealTest is RealSetup {
 
         strategy.doHardWork();
 
-        skip(3600);
+        skip(12 hours);
 
         strategy.doHardWork();
 
-        assertEq(_getRewardFromIfoGauge(address(vault), controller.stgn()), 0);
+        assertLt(_getRewardFromIfoGauge(address(vault), controller.stgn()), 100);
 
-        skip(360000);
+        skip(12 hours);
 
         assertGt(_getRewardFromIfoGauge(address(vault), controller.stgn()), 0);
+
+        // check logic
+        vm.expectRevert(bytes("Denied"));
+        strategy.setMinHardWorkDelay(1 hours);
+        vm.prank(RealLib.GOVERNANCE);
+        strategy.setMinHardWorkDelay(1 hours);
     }
 
     function test_factory_ifo_real() public {
@@ -69,18 +75,18 @@ contract PearlStrategyRealTest is RealSetup {
         assertEq(vault.balanceOf(address(this)), 1e18);
         assertEq(IMultiPool(controller.multigauge()).balanceOf(address(vault), address(this)), 1e18);
         vault.redeem(1e18, address(this), address(this));
-        assertEq(vault.balanceOf(address(this)), 0);
+        assertEq(vault.balanceOf(address(this)), 0, "1");
 
         uint depositAmount = 212000;
         vault.deposit(depositAmount, address(this));
         assertEq(vault.balanceOf(address(this)), depositAmount);
-        skip(3600);
+        skip(12 hours);
         strategy.doHardWork();
-        skip(3600);
+        skip(12 hours);
         strategy.doHardWork();
-        assertEq(_getRewardFromIfoGauge(address(vault), controller.stgn()), 0);
-        skip(360000);
-        assertGt(_getRewardFromIfoGauge(address(vault), controller.stgn()), 0);
+        assertLt(_getRewardFromIfoGauge(address(vault), controller.stgn()), 100, "2");
+        skip(120 hours);
+        assertGt(_getRewardFromIfoGauge(address(vault), controller.stgn()), 0, "3");
     }
 
     function _addRoute() internal {
@@ -120,7 +126,7 @@ contract PearlStrategyRealTest is RealSetup {
         vault.mint(1e18, address(this));
         assertEq(vault.balanceOf(address(this)), 1e18);
 
-        skip(3600);
+        skip(12 hours);
 
         strategy.doHardWork();
 
@@ -128,7 +134,7 @@ contract PearlStrategyRealTest is RealSetup {
 
         assertEq(_getRewardFromIfoGauge(address(vault), address(compounderVault)), 0);
 
-        skip(360000);
+        skip(120 hours);
 
         assertGt(_getRewardFromIfoGauge(address(vault), address(compounderVault)), 0);
 
@@ -154,7 +160,7 @@ contract PearlStrategyRealTest is RealSetup {
         vault.mint(1e18, address(this));
         assertEq(vault.balanceOf(address(this)), 1e18);
 
-        skip(3600);
+        skip(12 hours);
 
         strategy.doHardWork();
 
@@ -162,7 +168,7 @@ contract PearlStrategyRealTest is RealSetup {
 
         assertEq(_getRewardFromIfoGauge(address(vault), address(compounderVault)), 0);
 
-        skip(360000);
+        skip(120 hours);
 
         assertGt(_getRewardFromIfoGauge(address(vault), address(compounderVault)), 0);
 

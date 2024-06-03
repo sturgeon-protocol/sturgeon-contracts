@@ -17,8 +17,6 @@ import "./interfaces/IVeDistributor.sol";
 /* Compounding - creating more underlying                                               */
 /* Sending profit to different destinations                                             */
 /* Have rewards/compounding logic, depending on setup case                              */
-/* Strategy should send gas compensation on every compounding                           */
-/* Compensation will be taken from user part of profit but no more than 10%             */
 /* Compounding should be called no more frequently than 1 per 12h                       */
 /*´:°•.°+.*•´.*:˚.°*.˚•´.°:°•.°•.*•´.°:°•.°+.*•´.*:*.°:°•.°•.*•´.*:˚.°*.˚•´.°:°•.°+.*•´.*/
 
@@ -37,6 +35,10 @@ contract PearlStrategy is StrategyStrictBase {
 
     address public compounder;
 
+    uint public minHardWorkDelay = 12 hours;
+
+    error WaitTill(uint timestamp);
+
     constructor(address vault_, address gauge_, bool ifo_, address compounder_) StrategyStrictBase(vault_) {
         gauge = gauge_;
         ifo = ifo_;
@@ -54,15 +56,24 @@ contract PearlStrategy is StrategyStrictBase {
             IERC20(compounderAsset).approve(compounder_, type(uint).max);
             IERC20(compounder_).approve(controller.multigauge(), type(uint).max);
         }
+        lastHardWork = block.timestamp;
     }
 
-    function isReadyToHardWork() external view returns (bool) {
-        return IGaugeV2ALM(gauge).earnedReward(address(this)) > 0;
+    function setMinHardWorkDelay(uint delay) external {
+        if (msg.sender != IController(IVault(vault).controller()).governance()) {
+            revert("Denied");
+        }
+        minHardWorkDelay = delay;
     }
 
-    function doHardWork() external /* returns (uint earned, uint lost)*/ {
+    function doHardWork() external {
         // claim fees if available
         // liquidate fee if available
+
+        uint timelock = lastHardWork + minHardWorkDelay;
+        if (block.timestamp < timelock) {
+            revert WaitTill(timelock);
+        }
 
         uint rtReward = _claim();
         uint perfFee = rtReward / 10;
@@ -95,6 +106,12 @@ contract PearlStrategy is StrategyStrictBase {
                 multigauge.notifyRewardAmount(vault, _compounder, shares);
             }
         }
+
+        lastHardWork = block.timestamp;
+    }
+
+    function isReadyToHardWork() external view returns (bool) {
+        return block.timestamp > lastHardWork + minHardWorkDelay && IGaugeV2ALM(gauge).earnedReward(address(this)) > 0;
     }
 
     function investedAssets() public view override returns (uint) {

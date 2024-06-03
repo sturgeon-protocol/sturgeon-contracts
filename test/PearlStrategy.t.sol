@@ -8,7 +8,7 @@ import "../src/CompounderVault.sol";
 import "../src/Compounder.sol";
 
 contract PearlStrategyTest is MockSetup {
-    function test_ifo() public {
+    function test_ifo_local() public {
         HarvesterVault vault =
             new HarvesterVault(address(controller), IERC20(tokenA), "IFO Harvester MOCK_A", "xTokenA", 4_000);
         PearlStrategy strategy = new PearlStrategy(address(vault), address(pearlGauge), true, address(0));
@@ -29,6 +29,10 @@ contract PearlStrategyTest is MockSetup {
 
         skip(3600);
 
+        vm.expectRevert(abi.encodeWithSelector(PearlStrategy.WaitTill.selector, strategy.lastHardWork() + 12 hours));
+        strategy.doHardWork();
+        skip(3600 * 11);
+
         vm.expectRevert("Not valid vault");
         strategy.doHardWork();
 
@@ -36,7 +40,7 @@ contract PearlStrategyTest is MockSetup {
         strategy.doHardWork();
 
         deal(tokenC, address(pearlGauge), 1e18);
-        skip(3600);
+        skip(12 hours);
 
         strategy.doHardWork();
 
@@ -64,13 +68,13 @@ contract PearlStrategyTest is MockSetup {
         uint depositAmount = 212000;
         vault.deposit(depositAmount, address(this));
         assertEq(vault.balanceOf(address(this)), depositAmount);
-        skip(3600);
+        skip(12 hours);
         strategy.doHardWork();
         deal(tokenC, address(pearlGauge), 1e18);
-        skip(3600);
+        skip(12 hours);
         strategy.doHardWork();
         assertEq(_getRewardFromIfoGauge(address(vault), controller.stgn()), 0);
-        skip(360000);
+        skip(120 hours);
         assertGt(_getRewardFromIfoGauge(address(vault), controller.stgn()), 0);
     }
 
@@ -92,7 +96,7 @@ contract PearlStrategyTest is MockSetup {
         vault.mint(1e18, address(this));
         assertEq(vault.balanceOf(address(this)), 1e18);
 
-        skip(3600);
+        skip(12 hours);
 
         deal(tokenC, address(pearlGauge), 1e18);
         deal(tokenD, address(controller.liquidator()), 1e20);
@@ -102,7 +106,7 @@ contract PearlStrategyTest is MockSetup {
 
         assertEq(_getRewardFromIfoGauge(address(vault), address(compounderVault)), 0);
 
-        skip(360000);
+        skip(120 hours);
 
         assertGt(_getRewardFromIfoGauge(address(vault), address(compounderVault)), 0);
 
@@ -125,7 +129,7 @@ contract PearlStrategyTest is MockSetup {
         vault.mint(1e18, address(this));
         assertEq(vault.balanceOf(address(this)), 1e18);
 
-        skip(3600);
+        skip(12 hours);
 
         deal(tokenC, address(pearlGauge), 1e18);
         deal(tokenD, address(controller.liquidator()), 1e20);
@@ -135,7 +139,7 @@ contract PearlStrategyTest is MockSetup {
 
         assertEq(_getRewardFromIfoGauge(address(vault), address(compounderVault)), 0);
 
-        skip(360000);
+        skip(120 hours);
 
         assertGt(_getRewardFromIfoGauge(address(vault), address(compounderVault)), 0);
 
