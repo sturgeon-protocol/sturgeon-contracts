@@ -3,6 +3,7 @@ fs_permissions = [{ access = "read-write", path = "./"}]
 src = "src"
 out = "out"
 libs = ["lib"]
+evm_version = "shanghai"
 
 [fmt]
 int_types = "short"

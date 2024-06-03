@@ -7,7 +7,11 @@ import "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 import "openzeppelin-contracts/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 
 contract MockTetuLiquidator is ITetuLiquidator {
+    address public controller = address(0);
+
     mapping(address tokenIn => mapping(address tokenOut => uint price)) public prices;
+
+    function addLargestPools(PoolData[] memory _pools, bool rewrite) external {}
 
     function setPrice(address tokenIn, address tokenOut, uint price) external {
         prices[tokenIn][tokenOut] = price;
