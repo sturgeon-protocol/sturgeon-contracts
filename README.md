@@ -13,7 +13,7 @@
 * VeDistributor proxy [0x7dc43c0165bfc9d202fa24bef10992f599014999](https://explorer.re.al/address/0x7dc43c0165bfc9d202fa24bef10992f599014999?tab=contract)
 * Frontend [0x045c8a060474874c5918717ecd55f07b62c59a90](https://explorer.re.al/address/0x045c8a060474874c5918717ecd55f07b62c59a90?tab=contract)
 * DepositHelper [0xAf95468B1a624605bbFb862B0FB6e9C73Ad847b8](https://explorer.re.al/address/0xAf95468B1a624605bbFb862B0FB6e9C73Ad847b8?tab=contract)
-* Compounder proxy [0x87eDeA5aea52BA12Ebf4eBc253Ec3218C1090C70](https://explorer.re.al/address/0x87eDeA5aea52BA12Ebf4eBc253Ec3218C1090C70?tab=contract)
+* Compounder proxy [0x377c3bfed5e7675821f7a15ade25bc580d4c9bbb](https://explorer.re.al/address/0x377c3bfed5e7675821f7a15ade25bc580d4c9bbb?tab=contract)
 
 ### Unreal testnet
 
@@ -43,7 +43,7 @@ forge fmt
 ### Deploy
 
 ```shell
-forge script DeployReal --rpc-url https://real.drpc.org --slow --verify --verifier blockscout --verifier-url https://explorer.re.al/api?
+forge script DeployReal --skip-simulation --broadcast --with-gas-price 300000000 --rpc-url https://real.drpc.org --slow --verify --verifier blockscout --verifier-url https://explorer.re.al/api?
 ```
 
 ### Add liquidator routes

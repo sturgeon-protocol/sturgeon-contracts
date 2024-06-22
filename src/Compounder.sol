@@ -12,7 +12,7 @@ import "./lib/StringLib.sol";
 contract Compounder is Controllable {
     // --- CONSTANTS ---
 
-    string public constant VERSION = "1.0.0";
+    string public constant VERSION = "1.0.1";
     uint public constant DELAY_RATE_DENOMINATOR = 100_000;
     uint public constant HARDWORK_DELAY = 12 hours;
 
@@ -153,7 +153,6 @@ contract Compounder is Controllable {
                     && strategy.totalAssets() > 0
                 ) {
                     strategyNeedHardwork = true;
-                    break;
                 }
 
                 uint delayAdjusted = _delay;
